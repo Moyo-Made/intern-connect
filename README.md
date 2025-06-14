@@ -4,7 +4,7 @@
 
 InternConnect is a comprehensive platform designed to democratize access to tech internships by connecting ambitious students with innovative companies. Built by former interns who experienced the struggle firsthand, we're creating the platform we wish we had.
 
-![InternConnect Hero](https://github.com/Moyo-Made/intern-connect/raw/main/public/hero-screenshot.png)
+![InternConnect Hero](/public/hero.png)
 
 ## 🌟 Overview
 
@@ -24,7 +24,6 @@ Streamlined application process that saves you time. Create your profile once an
 ### 🔔 **Real-time Status Updates**
 Stay informed every step of the way. Get instant notifications about application status, interview invitations, and important updates.
 
-![Features Screenshot](https://github.com/Moyo-Made/intern-connect/raw/main/public/features-screenshot.png)
 
 ## 🛠️ How It Works
 
@@ -40,7 +39,6 @@ Apply to multiple internships with our one-click system. Your profile informatio
 ### Step 4: Get Hired
 Track your applications, receive interview invitations, and get real-time updates. Our success rate speaks for itself - 85% of users land internships.
 
-![Process Screenshot](https://github.com/Moyo-Made/intern-connect/raw/main/public/process-screenshot.png)
 
 ## 📊 Platform Statistics
 
@@ -49,7 +47,6 @@ Track your applications, receive interview invitations, and get real-time update
 - **85%** Success Rate
 - **25+** Countries
 
-![Stats Screenshot](https://github.com/Moyo-Made/intern-connect/raw/main/public/stats-screenshot.png)
 
 ## 🚀 Getting Started
 
@@ -105,20 +102,6 @@ Make sure you have the following installed:
 - **Font Optimization:** Geist font family
 - **Deployment:** Vercel Platform
 - **TypeScript:** For type safety and a better development experience
-
-## 📱 Screenshots
-
-### Hero Section
-![Hero Section](https://github.com/Moyo-Made/intern-connect/raw/main/public/hero-screenshot.png)
-
-### Features Overview
-![Features](https://github.com/Moyo-Made/intern-connect/raw/main/public/features-screenshot.png)
-
-### How It Works
-![Process](https://github.com/Moyo-Made/intern-connect/raw/main/public/process-screenshot.png)
-
-### Deployment Dashboard
-![Deployment](https://github.com/Moyo-Made/intern-connect/raw/main/public/deployment-screenshot.png)
 
 ## 🌐 Deployment
 
