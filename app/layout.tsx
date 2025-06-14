@@ -15,6 +15,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "InternConnect",
   description: "Student-Company Connection Platform",
+  icons: {
+    icon: '/bolt.png',
+    shortcut: '/bolt.png',
+    apple: '/bolt.png',
+  },
 };
 
 export default function RootLayout({
