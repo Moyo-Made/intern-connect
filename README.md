@@ -4,7 +4,7 @@
 
 InternConnect is a comprehensive platform designed to democratize access to tech internships by connecting ambitious students with innovative companies. Built by former interns who experienced the struggle firsthand, we're creating the platform we wish we had.
 
-![InternConnect Hero](/public/hero.png)
+![InternConnect Hero](/public/heroo.png)
 
 ## 🌟 Overview
 
