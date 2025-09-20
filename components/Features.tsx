@@ -100,7 +100,7 @@ const Features = () => {
 					<h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-slate-800 mb-6 leading-tight">
 						Built by Students Who
 						<br />
-						<span className="bg-gradient-to-r from-blue-600 via-blue-700 to-indigo-700 bg-clip-text text-transparent">Got Tired of Rejection</span>
+						<span className="text-blue-600">Got Tired of Rejection</span>
 					</h2>
 
 					<div className="max-w-3xl mx-auto">
