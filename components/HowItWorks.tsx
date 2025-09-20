@@ -105,7 +105,6 @@ const HowItWorks = () => {
 									className={`group text-center ${isVisible ? "animate-fade-in-up" : "opacity-0"}`}
 									style={{ animationDelay: `${step.delay}ms` }}
 								>
-									{/* Step Icon with Number */}
 									<div className="relative mb-6">
 										<div
 											className={`w-16 h-16 ${step.iconBg} rounded-xl flex items-center justify-center mx-auto group-hover:scale-110 transition-all duration-300 shadow-sm relative z-10`}
@@ -119,7 +118,7 @@ const HowItWorks = () => {
 										</div>
 									</div>
 
-									{/* Content */}
+									
 									<div
 										className={`p-6 ${step.bgColor} rounded-2xl border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300 group-hover:-translate-y-1`}
 									>

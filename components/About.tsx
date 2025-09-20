@@ -17,25 +17,25 @@ const About = () => {
 			icon: Users,
 			number: "50K+",
 			label: "Students Helped",
-			color: "from-blue-500 to-cyan-500",
+			color: "from-blue-500 to-blue-600",
 		},
 		{
 			icon: Award,
 			number: "500+",
 			label: "Partner Companies",
-			color: "from-purple-500 to-pink-500",
+			color: "from-blue-600 to-blue-700",
 		},
 		{
 			icon: TrendingUp,
 			number: "85%",
 			label: "Success Rate",
-			color: "from-green-500 to-emerald-500",
+			color: "from-blue-500 to-blue-600",
 		},
 		{
 			icon: Globe,
 			number: "25+",
 			label: "Countries",
-			color: "from-orange-500 to-red-500",
+			color: "from-blue-600 to-blue-700",
 		},
 	];
 
@@ -43,47 +43,41 @@ const About = () => {
 		{
 			icon: Target,
 			title: "Mission-Driven",
-			description:
-				"We're passionate about bridging the gap between talented students and innovative companies, creating opportunities that shape the future of tech.",
-			color: "from-blue-500 to-cyan-500",
+			description: "...",
+			color: "from-blue-500 to-blue-600",
 		},
 		{
 			icon: Heart,
 			title: "Student-First",
-			description:
-				"Every feature we build, every partnership we form, and every decision we make is centered around creating the best experience for students.",
-			color: "from-red-500 to-pink-500",
+			description: "...",
+			color: "from-emerald-500 to-emerald-600",
 		},
 		{
 			icon: Code,
 			title: "Innovation-Focused",
-			description:
-				"We leverage cutting-edge technology, including AI and machine learning, to continuously improve our platform and matching algorithms.",
-			color: "from-purple-500 to-violet-500",
+			description: "...",
+			color: "from-slate-500 to-slate-600",
 		},
 		{
 			icon: Lightbulb,
 			title: "Growth-Oriented",
-			description:
-				"We believe in the potential of every student and are committed to providing the resources and opportunities needed for career growth.",
-			color: "from-yellow-500 to-orange-500",
+			description: "...",
+			color: "from-orange-500 to-orange-600",
 		},
 	];
 
 	return (
 		<section
 			id="about"
-			className="py-20 bg-gradient-to-br from-gray-900 via-blue-900 to-purple-900 text-white relative overflow-hidden"
+			className="py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 text-white relative overflow-hidden"
 		>
-			{/* Background Elements */}
 			<div className="absolute inset-0">
 				<div className="absolute top-0 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full blur-3xl"></div>
-				<div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-3xl"></div>
+				<div className="absolute bottom-0 right-1/4 w-96 h-96 bg-slate-500/10 rounded-full blur-3xl"></div>
 				<div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-full h-px bg-gradient-to-r from-transparent via-blue-500/20 to-transparent"></div>
 			</div>
 
 			<div className="container mx-auto px-6 relative">
-				{/* Section Header */}
 				<div className="text-center max-w-4xl mx-auto mb-16">
 					<div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm text-blue-300 px-4 py-2 rounded-full text-sm font-medium mb-4">
 						<Heart className="w-4 h-4" />
@@ -97,13 +91,12 @@ const About = () => {
 						</span>
 					</h2>
 					<div className="max-w-2xl mx-auto">
-
-					<p className="text-lg text-gray-300 leading-relaxed mb-8">
-						We're on a mission to democratize access to tech internships and
-						empower the next generation of innovators. Founded by former interns
-						who experienced the struggle firsthand, we're building the platform
-						we wish we had.
-					</p>
+						<p className="text-lg text-gray-300 leading-relaxed mb-8">
+							We're on a mission to democratize access to tech internships and
+							empower the next generation of innovators. Founded by former
+							interns who experienced the struggle firsthand, we're building the
+							platform we wish we had.
+						</p>
 					</div>
 				</div>
 
@@ -127,7 +120,6 @@ const About = () => {
 					})}
 				</div>
 
-				{/* Story Section */}
 				<div className="grid lg:grid-cols-2 gap-12 items-center mb-20">
 					<div>
 						<h3 className="text-3xl font-bold text-white mb-6">Our Journey</h3>
@@ -202,10 +194,9 @@ const About = () => {
 					</div>
 				</div>
 
-				{/* CTA Section */}
 				<div className="text-center mt-16">
 					<div className="inline-flex flex-col sm:flex-row gap-4">
-						<button className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-500 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-600 transform hover:scale-105 transition-all duration-300 shadow-xl">
+						<button className="px-6 py-3 bg-blue-600 text-white font-semibold rounded-xl hover:bg-blue-700 transform hover:scale-105 transition-all duration-300 shadow-xl">
 							Join Our Mission
 						</button>
 						<button className="px-6 py-3 bg-white/10 backdrop-blur-sm text-white font-semibold rounded-xl border border-white/20 hover:bg-white/20 transform hover:scale-105 transition-all duration-300">
