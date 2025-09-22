@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Menu, X, LogIn, UserPlus, Zap } from "lucide-react";
 import LoginModal from "./LoginModal";
 import UserTypeModal from "./UserTypeModal";
+import RegisterModal from "./auth/RegisterModal";
 
 interface HeaderProps {
 	showLoginModal: false | "student" | "company" | "select";
@@ -190,7 +191,6 @@ const Header = ({
 					)}
 				</div>
 			</header>
-
 			{/* Modals */}
 			<UserTypeModal
 				isOpen={showLoginModal === "select"}
@@ -203,7 +203,6 @@ const Header = ({
 					setShowLoginModal("company");
 				}}
 			/>
-
 			<UserTypeModal
 				isOpen={showSignupModal === "select"}
 				onClose={() => setShowSignupModal(false)}
@@ -215,36 +214,30 @@ const Header = ({
 					setShowSignupModal("company");
 				}}
 			/>
-
+			{/* LOGIN MODALS */}
 			<LoginModal
 				isOpen={showLoginModal === "student"}
 				onClose={() => setShowLoginModal(false)}
-				title="Login as a Student"
-				userType="student"
+				userType="STUDENT"
 				onSwitchToSignup={handleSwitchToSignup}
 			/>
-
 			<LoginModal
 				isOpen={showLoginModal === "company"}
 				onClose={() => setShowLoginModal(false)}
-				title="Login as a Company"
-				userType="company"
+				userType="COMPANY"
 				onSwitchToSignup={handleSwitchToSignup}
 			/>
-
-			<LoginModal
+			{/* SIGNUP MODALS */}
+			<RegisterModal
 				isOpen={showSignupModal === "student"}
 				onClose={() => setShowSignupModal(false)}
-				title="Sign Up as a Student"
-				userType="student"
+				userType="STUDENT"
 				onSwitchToSignup={handleSwitchToLogin}
 			/>
-
-			<LoginModal
+			<RegisterModal
 				isOpen={showSignupModal === "company"}
 				onClose={() => setShowSignupModal(false)}
-				title="Sign Up as a Company"
-				userType="company"
+				userType="COMPANY"
 				onSwitchToSignup={handleSwitchToLogin}
 			/>
 		</>

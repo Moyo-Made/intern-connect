@@ -1,0 +1,187 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Enums for better type safety
+enum UserType {
+  STUDENT
+  COMPANY
+}
+
+enum ApplicationStatus {
+  PENDING
+  ACCEPTED
+  REJECTED
+  WITHDRAWN
+}
+
+enum CompanySize {
+  STARTUP          // 1-10
+  SMALL           // 11-50  
+  MEDIUM          // 51-200
+  LARGE           // 201-1000
+  ENTERPRISE      // 1000+
+}
+
+// Core Users table - handles authentication
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String    @map("password_hash")
+  userType      UserType  @map("user_type")
+  isVerified    Boolean   @default(false) @map("is_verified")
+  createdAt     DateTime  @default(now()) @map("created_at")
+  updatedAt     DateTime  @updatedAt @map("updated_at")
+
+  // Relations - one user can have one profile of their type
+  studentProfile  StudentProfile?
+  companyProfile  CompanyProfile?
+  
+  @@map("users")
+}
+
+// Student-specific profile data
+model StudentProfile {
+  id             String    @id @default(cuid())
+  userId         String    @unique @map("user_id")
+  firstName      String    @map("first_name")
+  lastName       String    @map("last_name")
+  university     String
+  major          String
+  graduationYear Int       @map("graduation_year")
+  phone          String?
+  resumeUrl      String?   @map("resume_url")
+  bio            String?   @db.Text
+  portfolioUrl   String?   @map("portfolio_url")
+  linkedinUrl    String?   @map("linkedin_url")
+  githubUrl      String?   @map("github_url")
+  createdAt      DateTime  @default(now()) @map("created_at")
+  updatedAt      DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  user           User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  userSkills     UserSkill[]
+  applications   Application[]
+
+  @@map("student_profiles")
+}
+
+// Company-specific profile data  
+model CompanyProfile {
+  id          String      @id @default(cuid())
+  userId      String      @unique @map("user_id")
+  companyName String      @map("company_name")
+  industry    String
+  description String?     @db.Text
+  location    String
+  website     String?
+  companySize CompanySize @map("company_size")
+  logoUrl     String?     @map("logo_url")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  internships  Internship[]
+
+  @@map("company_profiles")
+}
+
+// Skills master table
+model Skill {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  category    String?     // e.g., "Programming", "Design", "Marketing"
+  createdAt   DateTime    @default(now()) @map("created_at")
+
+  // Relations
+  userSkills        UserSkill[]
+  internshipSkills  InternshipSkill[]
+
+  @@map("skills")
+}
+
+// Many-to-many: Students can have multiple skills
+model UserSkill {
+  id        String   @id @default(cuid())
+  userId    String   @map("user_id")
+  skillId   String   @map("skill_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Relations
+  skill   Skill          @relation(fields: [skillId], references: [id], onDelete: Cascade)
+  student StudentProfile @relation(fields: [userId], references: [userId], onDelete: Cascade)
+
+  // Prevent duplicate user-skill combinations
+  @@unique([userId, skillId])
+  @@map("user_skills")
+}
+
+// Internship postings
+model Internship {
+  id               String    @id @default(cuid())
+  companyId        String    @map("company_id")
+  title            String
+  description      String    @db.Text
+  requirements     String[]  // Array of requirement strings
+  location         String
+  isRemote         Boolean   @default(false) @map("is_remote")
+  duration         String?   // e.g., "3 months", "Summer 2024"
+  stipend          Int?      // Monthly stipend in cents (avoid decimal issues)
+  applicationDeadline DateTime? @map("application_deadline")
+  startDate        DateTime? @map("start_date")
+  endDate          DateTime? @map("end_date")
+  isActive         Boolean   @default(true) @map("is_active")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+
+  // Relations
+  company            CompanyProfile    @relation(fields: [companyId], references: [userId], onDelete: Cascade)
+  applications       Application[]
+  internshipSkills   InternshipSkill[]
+
+  @@map("internships")
+}
+
+// Many-to-many: Internships can require multiple skills
+model InternshipSkill {
+  id           String @id @default(cuid())
+  internshipId String @map("internship_id")
+  skillId      String @map("skill_id")
+  isRequired   Boolean @default(true) @map("is_required") // vs "nice to have"
+
+  // Relations
+  internship Internship @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+  skill      Skill      @relation(fields: [skillId], references: [id], onDelete: Cascade)
+
+  // Prevent duplicate internship-skill combinations
+  @@unique([internshipId, skillId])
+  @@map("internship_skills")
+}
+
+// Student applications to internships
+model Application {
+  id           String            @id @default(cuid())
+  studentId    String            @map("student_id")
+  internshipId String            @map("internship_id")
+  status       ApplicationStatus @default(PENDING)
+  coverLetter  String?           @map("cover_letter") @db.Text
+  appliedAt    DateTime          @default(now()) @map("applied_at")
+  updatedAt    DateTime          @updatedAt @map("updated_at")
+
+  // Relations
+  student    StudentProfile @relation(fields: [studentId], references: [userId], onDelete: Cascade)
+  internship Internship     @relation(fields: [internshipId], references: [id], onDelete: Cascade)
+
+  // Prevent duplicate applications
+  @@unique([studentId, internshipId])
+  @@map("applications")
+}

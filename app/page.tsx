@@ -15,6 +15,7 @@ const page = () => {
 	const [showSignupModal, setShowSignupModal] = useState<
 		false | "student" | "company" | "select"
 	>(false);
+	
 	return (
 		<div style={{ fontFamily: "Satoshi, sans-serif" }}>
 			<link

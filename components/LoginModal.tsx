@@ -1,125 +1,304 @@
-import { X } from "lucide-react";
+"use client";
+
+import React, { useState } from "react";
+import { X, Loader2, Eye, EyeOff } from "lucide-react";
 
 interface LoginModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  title: string;
-  userType: "student" | "company";
-  onSwitchToSignup: () => void;
+	isOpen: boolean;
+	onClose: () => void;
+	userType: "STUDENT" | "COMPANY";
+	onSwitchToSignup: () => void;
+	onLoginSuccess?: (data: any) => void;
+	title?: string;
+}
+
+interface LoginResponse {
+	success: boolean;
+	message: string;
+	data?: {
+		user: {
+			id: string;
+			email: string;
+			userType: string;
+			isVerified: boolean;
+			createdAt: string;
+			lastLoginAt?: string;
+		};
+		profile: any;
+		token: string;
+	};
+	errors?: Record<string, string[]>;
 }
 
 const LoginModal = ({
-  isOpen,
-  onClose,
-  title,
-  userType,
-  onSwitchToSignup,
+	isOpen,
+	onClose,
+	userType,
+	onSwitchToSignup,
+	onLoginSuccess,
 }: LoginModalProps) => {
-  if (!isOpen) return null;
+	const [formData, setFormData] = useState({
+		email: "",
+		password: "",
+	});
+	const [showPassword, setShowPassword] = useState(false);
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState("");
+	const [validationErrors, setValidationErrors] = useState<
+		Record<string, string>
+	>({});
 
-  return (
-    <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
-      <div className="bg-white rounded-3xl max-w-md w-full p-8 transform transition-all">
-        <div className="flex justify-between items-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800">{title}</h2>
-          <button
-            onClick={onClose}
-            className="p-2 hover:bg-gray-100 text-black rounded-full transition-colors"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        </div>
+	if (!isOpen) return null;
 
-        <div className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Email
-            </label>
-            <input
-              type="email"
-              className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-              placeholder="Enter your email"
-            />
-          </div>
+	const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const { name, value } = e.target;
+		setFormData((prev) => ({ ...prev, [name]: value }));
 
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
-              Password
-            </label>
-            <input
-              type="password"
-              className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-              placeholder="Enter your password"
-            />
-          </div>
+		// Clear validation error for this field
+		if (validationErrors[name]) {
+			setValidationErrors((prev) => ({ ...prev, [name]: "" }));
+		}
 
-          {title.includes("Sign Up") && (
-            <>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  {userType === "student" ? "Full Name" : "Company Name"}
-                </label>
-                <input
-                  type="text"
-                  className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                  placeholder={
-                    userType === "student"
-                      ? "Enter your full name"
-                      : "Enter company name"
-                  }
-                />
-              </div>
+		// Clear auth error when user starts typing
+		if (error) setError("");
+	};
 
-              {userType === "student" && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    University
-                  </label>
-                  <input
-                    type="text"
-                    className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                    placeholder="Enter your university"
-                  />
-                </div>
-              )}
+	const validateForm = () => {
+		const errors: Record<string, string> = {};
 
-              {userType === "company" && (
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
-                    Industry
-                  </label>
-                  <select className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all">
-                    <option>Select industry</option>
-                    <option>Technology</option>
-                    <option>Finance</option>
-                    <option>Healthcare</option>
-                    <option>Education</option>
-                    <option>Other</option>
-                  </select>
-                </div>
-              )}
-            </>
-          )}
+		if (!formData.email.trim()) {
+			errors.email = "Email is required";
+		} else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+			errors.email = "Please enter a valid email address";
+		}
 
-          <button className="w-full bg-blue-500 text-white font-semibold py-3 rounded-xl hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200">
-            {title.includes("Login") ? "Sign In" : "Create Account"}
-          </button>
+		if (!formData.password.trim()) {
+			errors.password = "Password is required";
+		}
 
-          <div className="text-center text-sm text-gray-600">
-            {title.includes("Login")
-              ? "Don't have an account? "
-              : "Already have an account? "}
-            <button
-              onClick={onSwitchToSignup}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              {title.includes("Login") ? "Sign up" : "Sign in"}
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
+		return errors;
+	};
+
+	const handleSubmit = async (e: React.FormEvent) => {
+		e.preventDefault();
+
+		// Clear previous errors
+		setValidationErrors({});
+		setError("");
+
+		// Validate form
+		const errors = validateForm();
+		if (Object.keys(errors).length > 0) {
+			setValidationErrors(errors);
+			return;
+		}
+
+		setIsLoading(true);
+
+		try {
+			const response = await fetch("/api/auth/login", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					email: formData.email,
+					password: formData.password,
+				}),
+			});
+
+			const result: LoginResponse = await response.json();
+
+			if (!result.success) {
+				if (result.errors) {
+					// Handle validation errors from server
+					const serverErrors: Record<string, string> = {};
+					Object.entries(result.errors).forEach(([key, messages]) => {
+						serverErrors[key] = messages[0]; // Take first error message
+					});
+					setValidationErrors(serverErrors);
+				} else {
+					setError(result.message);
+				}
+				return;
+			}
+
+			// Store token in localStorage or handle it as needed
+			if (result.data?.token) {
+				localStorage.setItem("authToken", result.data.token);
+				localStorage.setItem("userData", JSON.stringify(result.data.user));
+				localStorage.setItem(
+					"userProfile",
+					JSON.stringify(result.data.profile)
+				);
+			}
+
+			// Call success callback if provided
+			if (onLoginSuccess && result.data) {
+				onLoginSuccess(result.data);
+			}
+
+			// Reset form and close modal on success
+			setFormData({ email: "", password: "" });
+			onClose();
+		} catch (err) {
+			console.error("Login error:", err);
+			setError("Network error. Please check your connection and try again.");
+		} finally {
+			setIsLoading(false);
+		}
+	};
+
+	const handleClose = () => {
+		setFormData({ email: "", password: "" });
+		setValidationErrors({});
+		setError("");
+		onClose();
+	};
+
+	return (
+		<div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+			<div className="bg-white rounded-3xl max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+				<div className="p-8">
+					{/* Header */}
+					<div className="flex justify-between items-center mb-6">
+						<div>
+							<h2 className="text-2xl font-bold text-gray-900">Sign In</h2>
+							<p className="text-sm text-gray-600 mt-1">
+								Welcome back, {userType === "STUDENT" ? "Student" : "Company"}
+							</p>
+						</div>
+						<button
+							onClick={handleClose}
+							className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+							disabled={isLoading}
+						>
+							<X className="h-5 w-5" />
+						</button>
+					</div>
+
+					{/* Error Alert */}
+					{error && (
+						<div className="mb-6 p-4 bg-red-50 border border-red-200 text-red-800 rounded-lg">
+							<p className="text-sm">{error}</p>
+						</div>
+					)}
+
+					<form onSubmit={handleSubmit} className="space-y-4">
+						{/* Email Field */}
+						<div className="space-y-2">
+							<label
+								htmlFor="email"
+								className="block text-sm font-medium text-gray-700"
+							>
+								Email Address
+							</label>
+							<input
+								id="email"
+								name="email"
+								type="email"
+								value={formData.email}
+								onChange={handleInputChange}
+								placeholder="Enter your email address"
+								className={`w-full px-4 py-3 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+									validationErrors.email ? "border-red-500" : "border-gray-300"
+								}`}
+								disabled={isLoading}
+							/>
+							{validationErrors.email && (
+								<p className="text-sm text-red-600">{validationErrors.email}</p>
+							)}
+						</div>
+
+						{/* Password Field */}
+						<div className="space-y-2">
+							<label
+								htmlFor="password"
+								className="block text-sm font-medium text-gray-700"
+							>
+								Password
+							</label>
+							<div className="relative">
+								<input
+									id="password"
+									name="password"
+									type={showPassword ? "text" : "password"}
+									value={formData.password}
+									onChange={handleInputChange}
+									placeholder="Enter your password"
+									className={`w-full px-4 py-3 pr-12 border rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all ${
+										validationErrors.password
+											? "border-red-500"
+											: "border-gray-300"
+									}`}
+									disabled={isLoading}
+								/>
+								<button
+									type="button"
+									onClick={() => setShowPassword(!showPassword)}
+									className="absolute right-3 top-1/2 transform -translate-y-1/2 p-1 hover:bg-gray-100 rounded transition-colors"
+									disabled={isLoading}
+								>
+									{showPassword ? (
+										<EyeOff className="h-4 w-4 text-gray-500" />
+									) : (
+										<Eye className="h-4 w-4 text-gray-500" />
+									)}
+								</button>
+							</div>
+							{validationErrors.password && (
+								<p className="text-sm text-red-600">
+									{validationErrors.password}
+								</p>
+							)}
+						</div>
+
+						{/* Forgot Password Link */}
+						<div className="text-right">
+							<button
+								type="button"
+								className="text-sm text-blue-600 hover:underline"
+								disabled={isLoading}
+							>
+								Forgot password?
+							</button>
+						</div>
+
+						{/* Submit Button */}
+						<button
+							type="submit"
+							disabled={isLoading}
+							className="w-full bg-blue-500 text-white font-semibold py-3 rounded-xl hover:bg-blue-600 hover:shadow-lg transform hover:scale-[1.02] transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center"
+						>
+							{isLoading ? (
+								<>
+									<Loader2 className="mr-2 h-4 w-4 animate-spin" />
+									Signing in...
+								</>
+							) : (
+								"Sign In"
+							)}
+						</button>
+
+						{/* Switch to Signup */}
+						<div className="text-center pt-4 border-t border-gray-200">
+							<p className="text-sm text-gray-600">
+								Don't have an account?{" "}
+								<button
+									type="button"
+									onClick={onSwitchToSignup}
+									className="text-blue-600 hover:underline font-medium"
+									disabled={isLoading}
+								>
+									Sign up
+								</button>
+							</p>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+	);
 };
 
 export default LoginModal;
