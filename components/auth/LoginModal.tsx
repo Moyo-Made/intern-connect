@@ -2,6 +2,7 @@
 
 import React, { useState } from "react";
 import { X, Loader2, Eye, EyeOff } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 interface LoginModalProps {
 	isOpen: boolean;
@@ -37,6 +38,7 @@ const LoginModal = ({
 	onSwitchToSignup,
 	onLoginSuccess,
 }: LoginModalProps) => {
+	const router = useRouter();
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -109,6 +111,7 @@ const LoginModal = ({
 
 			const result: LoginResponse = await response.json();
 
+			// Handle login failure
 			if (!result.success) {
 				if (result.errors) {
 					// Handle validation errors from server
@@ -123,27 +126,70 @@ const LoginModal = ({
 				return;
 			}
 
-			// Store token in localStorage or handle it as needed
-			if (result.data?.token) {
-				localStorage.setItem("authToken", result.data.token);
-				localStorage.setItem("userData", JSON.stringify(result.data.user));
-				localStorage.setItem(
-					"userProfile",
-					JSON.stringify(result.data.profile)
+			if (!result.data) {
+				console.error("⚠️ No data in successful response");
+				setError("Login successful but no user data received");
+				return;
+			}
+
+			// Verify user type matches expected type
+			const userTypeFromResponse = result.data.user.userType;
+
+			if (userTypeFromResponse !== userType) {
+				console.error("❌ User type mismatch");
+				setError(
+					`This account is registered as ${userTypeFromResponse.toLowerCase()}, not ${userType.toLowerCase()}`
 				);
+				return;
 			}
 
-			// Call success callback if provided
-			if (onLoginSuccess && result.data) {
-				onLoginSuccess(result.data);
+			// Determine dashboard path
+			const dashboardPath =
+				userType === "STUDENT" ? "/dashboard/student" : "/dashboard/company";
+
+			// Call success callback first (if provided)
+			if (onLoginSuccess) {
+				try {
+					onLoginSuccess(result.data);
+				} catch (callbackError) {
+					console.error("💥 Error in onLoginSuccess callback:", callbackError);
+					// Don't return here - continue with navigation
+				}
 			}
 
-			// Reset form and close modal on success
+			// Store token in localStorage as backup
+			if (result.data.token) {
+				localStorage.setItem("authToken", result.data.token);
+			}
+
+			// Reset form state
 			setFormData({ email: "", password: "" });
+			setValidationErrors({});
+			setError("");
+
+			// Close modal
 			onClose();
+
+			// Navigate to dashboard
+			router.push(dashboardPath);
+
+			// Force page refresh as fallback (only if navigation seems stuck)
+			setTimeout(() => {
+				if (window.location.pathname !== dashboardPath) {
+					window.location.href = dashboardPath;
+				}
+			}, 1000);
 		} catch (err) {
-			console.error("Login error:", err);
-			setError("Network error. Please check your connection and try again.");
+			console.error("💥 Login error:", err);
+
+			// More specific error handling
+			if (err instanceof TypeError && err.message.includes("fetch")) {
+				setError("Network error. Please check your internet connection.");
+			} else if (err instanceof Error) {
+				setError(`Error: ${err.message}`);
+			} else {
+				setError("An unexpected error occurred. Please try again.");
+			}
 		} finally {
 			setIsLoading(false);
 		}

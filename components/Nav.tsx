@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Menu, X, LogIn, UserPlus, Zap } from "lucide-react";
-import LoginModal from "./LoginModal";
+import LoginModal from "./auth/LoginModal";
 import UserTypeModal from "./UserTypeModal";
 import RegisterModal from "./auth/RegisterModal";
 

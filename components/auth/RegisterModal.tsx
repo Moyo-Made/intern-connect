@@ -6,6 +6,7 @@ import { UserType, CompanySize } from "@prisma/client";
 import { useAuth } from "@/contexts/AuthContext";
 import z from "zod";
 import { registrationSchema } from "@/lib/validation";
+import { useRouter } from "next/navigation";
 
 interface RegisterModalProps {
 	isOpen: boolean;
@@ -24,6 +25,7 @@ export default function RegisterModal({
 	onSwitchToSignup,
 	title,
 }: RegisterModalProps) {
+	const router = useRouter();
 	const { register, isLoading, error, clearError } = useAuth();
 	const [formData, setFormData] = useState({
 		email: "",
@@ -105,8 +107,13 @@ export default function RegisterModal({
 
 		if (result.success) {
 			setSuccessMessage(result.message);
-			// Close modal after successful registration
+			const dashboardPath =
+				userType === UserType.STUDENT
+					? "/dashboard/student"
+					: "/dashboard/company";
+
 			setTimeout(() => {
+				router.push(dashboardPath);
 				onClose();
 			}, 1500);
 		}
