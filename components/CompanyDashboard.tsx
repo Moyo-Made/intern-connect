@@ -38,10 +38,11 @@ import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import Link from "next/link";
 import { useEffect } from "react";
-import { authApi } from "@/lib/api-client";
+import { authApi, internshipsApi } from "@/lib/api-client";
 import { AuthUser, CompanyProfile } from "@/types/interface";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/AuthContext";
+import { InternshipData } from "@/lib/validation";
 
 const CompanyDashboard = () => {
 	const [activeTab, setActiveTab] = useState("overview");
@@ -56,10 +57,9 @@ const CompanyDashboard = () => {
 		description: "",
 		location: "",
 		requirements: "",
-		type: "full-time",
-		duration: "3-months",
+		duration: "3 months",
+		stipend: "",
 	});
-
 	const [isLoading, setIsLoading] = useState(true);
 	const { user, isAuthenticated, logout, isLoading: authLoading } = useAuth();
 
@@ -173,17 +173,36 @@ const CompanyDashboard = () => {
 		}));
 	};
 
-	const handleSubmit = (e: { preventDefault: () => void }) => {
+	const handleSubmit = async (e: { preventDefault: () => void }) => {
 		e.preventDefault();
-		setShowCreateModal(false);
-		setFormData({
-			title: "",
-			description: "",
-			location: "",
-			requirements: "",
-			type: "full-time",
-			duration: "3-months",
-		});
+
+		try {
+			// Convert form data to match API expectations
+			const submitData = {
+				...formData,
+				stipend: formData.stipend ? parseInt(formData.stipend) : undefined,
+			};
+
+			const response = await internshipsApi.create(submitData);
+
+			if (response.success) {
+				setShowCreateModal(false);
+				setFormData({
+					title: "",
+					description: "",
+					location: "",
+					requirements: "",
+					duration: "3 months",
+					stipend: "",
+				});
+				// Optionally refresh internships list or show success message
+			} else {
+				// Handle errors - show error message to user
+				console.error("Failed to create internship:", response.message);
+			}
+		} catch (error) {
+			console.error("Error creating internship:", error);
+		}
 	};
 
 	const getStatusColor = (status: string) => {
@@ -809,25 +828,7 @@ const CompanyDashboard = () => {
 								/>
 							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">
-										Type
-									</label>
-									<Select
-										value={formData.type}
-										onValueChange={(value) =>
-											setFormData((prev) => ({ ...prev, type: value }))
-										}
-									>
-										<SelectTrigger>
-											<SelectValue />
-										</SelectTrigger>
-										<SelectContent>
-											<SelectItem value="full-time">Full-time</SelectItem>
-											<SelectItem value="part-time">Part-time</SelectItem>
-										</SelectContent>
-									</Select>
-								</div>
+								
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-1">
 										Duration
@@ -835,7 +836,10 @@ const CompanyDashboard = () => {
 									<Select
 										value={formData.duration}
 										onValueChange={(value) =>
-											setFormData((prev) => ({ ...prev, duration: value }))
+											setFormData((prev) => ({
+												...prev,
+												duration: value as InternshipData["duration"],
+											}))
 										}
 									>
 										<SelectTrigger>
@@ -847,6 +851,22 @@ const CompanyDashboard = () => {
 											<SelectItem value="12-months">12 months</SelectItem>
 										</SelectContent>
 									</Select>
+								</div>
+
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-1">
+										Monthly Stipend (optional)
+									</label>
+									<Input
+										type="number"
+										name="stipend"
+										value={formData.stipend}
+										onChange={handleInputChange}
+										placeholder="e.g. 1500"
+									/>
+									<p className="text-xs text-gray-500 mt-1">
+										Amount in your local currency
+									</p>
 								</div>
 							</div>
 							<div>

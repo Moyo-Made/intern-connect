@@ -40,6 +40,24 @@ export const companyRegistrationSchema = baseUserRegistrationSchema.extend({
   description: z.string().max(1000, 'Description too long').optional(),
 })
 
+export const internshipSchema = z.object({
+  title: z.string().min(1, 'Title is required'),
+  description: z.string().min(1, 'Description is required'),
+  location: z.string().min(1, 'Location is required'),
+  requirements: z.union([
+    z.array(z.string()),
+    z.string()
+  ]),
+  duration: z.string().min(1, 'Duration is required'),
+  stipend: z.number().optional(),
+  applicationDeadline: z.iso.datetime().optional(),
+  startDate: z.iso.datetime().optional(),
+  endDate: z.iso.datetime().optional(),
+})
+
+export type InternshipData = z.infer<typeof internshipSchema>
+
+
 // Union type for registration
 export const registrationSchema = z.discriminatedUnion('userType', [
   studentRegistrationSchema,

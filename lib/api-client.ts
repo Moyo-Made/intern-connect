@@ -1,4 +1,4 @@
-import { RegistrationData, LoginData } from "./validation";
+import { RegistrationData, LoginData, InternshipData } from "./validation";
 
 const API_BASE = "/api";
 
@@ -76,6 +76,16 @@ export const authenticatedApiCall = <T>(
 	});
 };
 
+export const internshipsApi = {
+	// Post new internship
+	create: async (internshipData: InternshipData): Promise<ApiResponse> => {
+	  return authenticatedApiCall("/internships", {
+		method: "POST",
+		body: JSON.stringify(internshipData),
+	  });
+	},
+  };
+
 // Auth API functions
 export const authApi = {
 	// Register new user
@@ -100,6 +110,8 @@ export const authApi = {
 			method: "GET",
 		});
 	},
+
+	
 
 	// Logout user (if you implement server-side logout)
 	logout: async (): Promise<ApiResponse> => {
