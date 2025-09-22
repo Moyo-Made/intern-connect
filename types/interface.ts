@@ -32,6 +32,7 @@ export interface CompanyProfile {
 	description?: string;
 	companySize: string;
 	logoUrl?: string;
+	phoneNumber?: number
 }
 
 export interface AuthUser {

@@ -38,20 +38,20 @@ async function apiCall<T>(
 export const tokenManager = {
 	set: (token: string) => {
 		if (typeof window !== "undefined") {
-			localStorage.setItem("token", token);
+			localStorage.setItem("authToken", token);
 		}
 	},
 
 	get: (): string | null => {
 		if (typeof window !== "undefined") {
-			return localStorage.getItem("token");
+			return localStorage.getItem("authToken");
 		}
 		return null;
 	},
 
 	remove: () => {
 		if (typeof window !== "undefined") {
-			localStorage.removeItem("token");
+			localStorage.removeItem("authToken");
 		}
 	},
 
@@ -94,7 +94,7 @@ export const authApi = {
 		});
 	},
 
-	// Get current user (NEW!)
+	// Get current user
 	me: async (): Promise<ApiResponse> => {
 		return authenticatedApiCall("/auth/me", {
 			method: "GET",

@@ -1,6 +1,6 @@
 "use client";
 
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import {
 	Search,
 	Filter,
@@ -31,12 +31,53 @@ import {
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { AuthUser, StudentProfile } from "@/types/interface";
+import { authApi } from "@/lib/api-client";
+import { useAuth } from "@/contexts/AuthContext";
 
 const StudentDashboard = () => {
 	const [activeTab, setActiveTab] = useState("internships");
 	const [searchTerm, setSearchTerm] = useState("");
 	const [locationFilter, setLocationFilter] = useState("");
 	const [companyFilter, setCompanyFilter] = useState("");
+	const [userData, setUserData] = useState<AuthUser | null>(null);
+	const router = useRouter();
+	const [isLoading, setIsLoading] = useState(true);
+	const { user, isAuthenticated, logout, isLoading: authLoading } = useAuth();
+
+	useEffect(() => {
+		// Don't redirect while auth is still loading
+		if (authLoading) return;
+
+		if (!isAuthenticated || !user) {
+			router.push("/login");
+			return;
+		}
+
+		// Redirect if wrong user type
+		if (user.user.userType !== "STUDENT") {
+			router.push("/dashboard/company");
+		}
+	}, [authLoading, isAuthenticated, user, router]);
+
+	useEffect(() => {
+		const fetchUserData = async () => {
+			try {
+				setIsLoading(true);
+				const response = await authApi.me();
+				if (response.success) {
+					setUserData(response.data);
+				}
+			} catch (error) {
+				console.error("Failed to fetch user data:", error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchUserData();
+	}, []);
 
 	// Mock data
 	const internships = [
@@ -141,57 +182,70 @@ const StudentDashboard = () => {
 		}
 	};
 
+	const handleLogout = () => {
+		logout();
+		router.push("/");
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Header */}
 			<header className="bg-white shadow-sm border-b">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center h-16">
-					<Link href="/">
-						<div className="flex items-center space-x-3">
-							<div className="relative">
-								<svg
-									width="32"
-									height="32"
-									viewBox="0 0 32 32"
-									className="text-slate-800"
-								>
-									<circle
-										cx="12"
-										cy="16"
-										r="8"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2.5"
-										className="text-blue-600"
-									/>
-									<circle
-										cx="20"
-										cy="16"
-										r="8"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2.5"
-										className="text-slate-700"
-									/>
-									<circle
-										cx="16"
-										cy="16"
-										r="2"
-										fill="currentColor"
-										className="text-blue-600"
-									/>
-								</svg>
+						<Link href="/">
+							<div className="flex items-center space-x-3">
+								<div className="relative">
+									<svg
+										width="32"
+										height="32"
+										viewBox="0 0 32 32"
+										className="text-slate-800"
+									>
+										<circle
+											cx="12"
+											cy="16"
+											r="8"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2.5"
+											className="text-blue-600"
+										/>
+										<circle
+											cx="20"
+											cy="16"
+											r="8"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2.5"
+											className="text-slate-700"
+										/>
+										<circle
+											cx="16"
+											cy="16"
+											r="2"
+											fill="currentColor"
+											className="text-blue-600"
+										/>
+									</svg>
+								</div>
+								<div className="flex flex-col">
+									<span className="text-xl font-bold text-slate-800 leading-none">
+										InternConnect
+									</span>
+								</div>
 							</div>
-							<div className="flex flex-col">
-								<span className="text-xl font-bold text-slate-800 leading-none">
-									InternConnect
-								</span>
-							</div>
-						</div>
 						</Link>
 						<div className="flex items-center space-x-4">
-							<span className="text-gray-700">Welcome back, Alex</span>
+							<span className="text-gray-700">
+								{isLoading
+									? "Loading..."
+									: `Welcome back, ${
+											user?.user.userType === "STUDENT"
+												? (user.profile as StudentProfile).firstName
+												: user?.user?.email || "User"
+										}`}
+							</span>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button
@@ -202,7 +256,11 @@ const StudentDashboard = () => {
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-56">
-									<DropdownMenuLabel>Alex Johnson</DropdownMenuLabel>
+									<DropdownMenuLabel>
+										{user?.user.userType === "STUDENT"
+											? `${(user.profile as StudentProfile).firstName} ${(user.profile as StudentProfile).lastName}`
+											: user?.user?.email || "User"}
+									</DropdownMenuLabel>
 									<DropdownMenuSeparator />
 									<DropdownMenuItem
 										onClick={() => setActiveTab("profile")}
@@ -212,7 +270,10 @@ const StudentDashboard = () => {
 										<span>Profile</span>
 									</DropdownMenuItem>
 
-									<DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600">
+									<DropdownMenuItem
+										className="cursor-pointer text-red-600 focus:text-red-600"
+										onClick={handleLogout}
+									>
 										<LogOut className="mr-2 h-4 w-4" />
 										<span>Logout</span>
 									</DropdownMenuItem>

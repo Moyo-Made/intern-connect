@@ -9,7 +9,6 @@ import {
 	Building2,
 	MapPin,
 	Calendar,
-	Settings,
 	LogOut,
 	Edit,
 	Trash2,
@@ -38,11 +37,18 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
 import Link from "next/link";
+import { useEffect } from "react";
+import { authApi } from "@/lib/api-client";
+import { AuthUser, CompanyProfile } from "@/types/interface";
+import { useRouter } from "next/navigation";
+import { useAuth } from "@/contexts/AuthContext";
 
 const CompanyDashboard = () => {
 	const [activeTab, setActiveTab] = useState("overview");
 	const [showCreateModal, setShowCreateModal] = useState(false);
 	const [selectedInternship, setSelectedInternship] = useState(null);
+	const [userData, setUserData] = useState<AuthUser | null>(null);
+	const router = useRouter();
 
 	// Form state for creating new internships
 	const [formData, setFormData] = useState({
@@ -54,6 +60,41 @@ const CompanyDashboard = () => {
 		duration: "3-months",
 	});
 
+	const [isLoading, setIsLoading] = useState(true);
+	const { user, isAuthenticated, logout, isLoading: authLoading } = useAuth();
+
+	useEffect(() => {
+		// Don't redirect while auth is still loading
+		if (authLoading) return;
+
+		if (!isAuthenticated || !user) {
+			router.push("/login");
+			return;
+		}
+
+		// Redirect if wrong user type
+		if (user.user.userType !== "COMPANY") {
+			router.push("/dashboard/student");
+		}
+	}, [authLoading, isAuthenticated, user, router]);
+
+	useEffect(() => {
+		const fetchUserData = async () => {
+			try {
+				setIsLoading(true);
+				const response = await authApi.me();
+				if (response.success) {
+					setUserData(response.data);
+				}
+			} catch (error) {
+				console.error("Failed to fetch user data:", error);
+			} finally {
+				setIsLoading(false);
+			}
+		};
+
+		fetchUserData();
+	}, []);
 	// Mock data
 	const internships = [
 		{
@@ -180,6 +221,11 @@ const CompanyDashboard = () => {
 		}
 	};
 
+	const handleLogout = () => {
+		logout();
+		router.push("/");
+	};
+
 	return (
 		<div className="min-h-screen bg-gray-50">
 			{/* Header */}
@@ -230,7 +276,15 @@ const CompanyDashboard = () => {
 							</div>
 						</Link>
 						<div className="flex items-center space-x-4">
-							<span className="text-gray-700">Welcome back, TechCorp</span>
+							<span className="text-gray-700">
+								{isLoading
+									? "Loading..."
+									: `Welcome back, ${
+											userData?.user.userType === "COMPANY"
+												? (userData.profile as CompanyProfile).companyName
+												: userData?.user?.email || "User"
+										}`}
+							</span>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
 									<Button
@@ -241,7 +295,11 @@ const CompanyDashboard = () => {
 									</Button>
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-56">
-									<DropdownMenuLabel>TechCorp Inc.</DropdownMenuLabel>
+									<DropdownMenuLabel>
+										{userData?.user.userType === "COMPANY"
+											? (userData.profile as CompanyProfile).companyName
+											: "User"}
+									</DropdownMenuLabel>
 									<DropdownMenuSeparator />
 									<DropdownMenuItem
 										onClick={() => setActiveTab("profile")}
@@ -251,7 +309,10 @@ const CompanyDashboard = () => {
 										<span>Company Profile</span>
 									</DropdownMenuItem>
 
-									<DropdownMenuItem className="cursor-pointer text-red-600 focus:text-red-600">
+									<DropdownMenuItem
+										className="cursor-pointer text-red-600 focus:text-red-600"
+										onClick={handleLogout}
+									>
 										<LogOut className="mr-2 h-4 w-4" />
 										<span>Logout</span>
 									</DropdownMenuItem>
@@ -626,25 +687,50 @@ const CompanyDashboard = () => {
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											Company Name
 										</label>
-										<Input type="text" defaultValue="TechCorp Inc." />
+										<Input
+											type="text"
+											defaultValue={
+												userData?.user.userType === "COMPANY"
+													? (userData.profile as CompanyProfile).companyName
+													: ""
+											}
+										/>
 									</div>
 									<div>
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											Email
 										</label>
-										<Input type="email" defaultValue="hr@techcorp.com" />
+										<Input
+											type="email"
+											defaultValue={userData?.user?.email || ""}
+										/>
 									</div>
 									<div>
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											Phone
 										</label>
-										<Input type="tel" defaultValue="+1 (555) 987-6543" />
+										<Input
+											type="tel"
+											defaultValue={
+												userData?.user.userType === "COMPANY"
+													? (userData.profile as CompanyProfile).phoneNumber ||
+														""
+													: ""
+											}
+										/>
 									</div>
 									<div>
 										<label className="block text-sm font-medium text-gray-700 mb-1">
 											Website
 										</label>
-										<Input type="url" defaultValue="https://techcorp.com" />
+										<Input
+											type="url"
+											defaultValue={
+												userData?.user.userType === "COMPANY"
+													? (userData.profile as CompanyProfile).website || ""
+													: ""
+											}
+										/>
 									</div>
 									<div>
 										<label className="block text-sm font-medium text-gray-700 mb-1">
@@ -652,7 +738,12 @@ const CompanyDashboard = () => {
 										</label>
 										<Textarea
 											rows={4}
-											defaultValue="TechCorp is a leading technology company specializing in innovative software solutions. We're committed to fostering talent and providing meaningful internship opportunities."
+											defaultValue={
+												userData?.user.userType === "COMPANY"
+													? (userData.profile as CompanyProfile).description ||
+														""
+													: ""
+											}
 										/>
 									</div>
 								</div>

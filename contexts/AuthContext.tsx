@@ -93,18 +93,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 	const checkAuthStatus = async () => {
 		// Check both token sources
 		let token = tokenManager.get();
-		const backupToken = localStorage.getItem("token");
-		const authToken = localStorage.getItem("authToken");
-
-		// Use backup token if primary is missing
-		if (!token && (backupToken || authToken)) {
-			token = backupToken || authToken;
-
-			// Restore token to primary storage
-			if (tokenManager.set) {
-				tokenManager.set(token || "");
-			}
-		}
 
 		if (!token) {
 			dispatch({ type: "AUTH_ERROR", payload: "No token found" });
@@ -125,8 +113,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				});
 			} else {
 				tokenManager.remove();
-				localStorage.removeItem("token");
-				localStorage.removeItem("authToken");
 				dispatch({
 					type: "AUTH_ERROR",
 					payload: result.message || "Token verification failed",
@@ -135,8 +121,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		} catch (error) {
 			console.error("💥 Auth check error:", error);
 			tokenManager.remove();
-			localStorage.removeItem("token");
-			localStorage.removeItem("authToken");
 			dispatch({
 				type: "AUTH_ERROR",
 				payload: "Network error during auth check",
@@ -155,7 +139,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				if (tokenManager?.set) {
 					tokenManager.set(response.data.token);
 				}
-				localStorage.setItem("token", response.data.token);
 
 				dispatch({
 					type: "AUTH_SUCCESS",
@@ -196,7 +179,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 				if (tokenManager?.set) {
 					tokenManager.set(response.data.token);
 				}
-				localStorage.setItem("token", response.data.token);
 
 				dispatch({
 					type: "AUTH_SUCCESS",
@@ -230,8 +212,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 		if (tokenManager?.remove) {
 			tokenManager.remove();
 		}
-		localStorage.removeItem("token");
-		localStorage.removeItem("authToken");
 
 		dispatch({ type: "AUTH_LOGOUT" });
 	}, []);
