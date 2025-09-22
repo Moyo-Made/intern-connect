@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
 import { UserType, CompanySize } from "@prisma/client";
-import { useAuth } from "@/contexts/AuthContext";
 import z from "zod";
 import { registrationSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
@@ -26,7 +25,6 @@ export default function RegisterModal({
 	title,
 }: RegisterModalProps) {
 	const router = useRouter();
-	const { register, isLoading, error, clearError } = useAuth();
 	const [formData, setFormData] = useState({
 		email: "",
 		password: "",
@@ -49,6 +47,8 @@ export default function RegisterModal({
 		Record<string, string>
 	>({});
 	const [successMessage, setSuccessMessage] = useState("");
+	const [isLoading, setIsLoading] = useState(false);
+	const [error, setError] = useState("");
 
 	if (!isOpen) return null;
 
@@ -76,7 +76,7 @@ export default function RegisterModal({
 		e.preventDefault();
 		setValidationErrors({});
 		setSuccessMessage("");
-		clearError();
+		setError("");
 
 		const registrationData: RegistrationData =
 			userType === UserType.STUDENT
@@ -103,19 +103,112 @@ export default function RegisterModal({
 						description: formData.description || undefined,
 					};
 
-		const result = await register(registrationData);
+		setIsLoading(true);
 
-		if (result.success) {
-			setSuccessMessage(result.message);
+		try {
+			const response = await fetch("/api/auth/register", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify(registrationData),
+			});
+
+			const result = await response.json();
+
+			// Handle registration failure
+			if (!result.success) {
+				if (result.errors) {
+					// Handle validation errors from server
+					const serverErrors: Record<string, string> = {};
+					Object.entries(result.errors).forEach(([key, messages]) => {
+						if (Array.isArray(messages)) {
+							serverErrors[key] = messages[0];
+						}
+					});
+					setValidationErrors(serverErrors);
+				} else {
+					setError(result.message);
+				}
+				return;
+			}
+
+			if (!result.data) {
+				console.error("⚠️ No data in successful response");
+				setError("Registration successful but no user data received");
+				return;
+			}
+
+			// Verify user type matches expected type
+			const userTypeFromResponse = result.data.user.userType;
+
+			if (userTypeFromResponse !== userType) {
+				console.error("❌ User type mismatch during registration");
+				setError(
+					`Registration error: Expected ${userType}, got ${userTypeFromResponse}`
+				);
+				return;
+			}
+
+			// Store token in localStorage
+			if (result.data.token) {
+				localStorage.setItem("authToken", result.data.token);
+				// Also store in the backup location for consistency
+				localStorage.setItem("token", result.data.token);
+			}
+
+			// Show success message
+			setSuccessMessage(result.message || "Account created successfully!");
+
+			// Determine dashboard path
 			const dashboardPath =
 				userType === UserType.STUDENT
 					? "/dashboard/student"
 					: "/dashboard/company";
 
+			// Reset form data
+			setFormData({
+				email: "",
+				password: "",
+				firstName: "",
+				lastName: "",
+				university: "",
+				major: "",
+				graduationYear: new Date().getFullYear() + 1,
+				phone: "",
+				companyName: "",
+				industry: "",
+				location: "",
+				companySize: CompanySize.STARTUP,
+				website: "",
+				description: "",
+			});
+
+			// Navigate after showing success message
 			setTimeout(() => {
 				router.push(dashboardPath);
 				onClose();
 			}, 1500);
+
+			// Fallback navigation in case router.push doesn't work
+			setTimeout(() => {
+				if (window.location.pathname !== dashboardPath) {
+					window.location.href = dashboardPath;
+				}
+			}, 3000);
+		} catch (err) {
+			console.error("💥 Registration error:", err);
+
+			// More specific error handling
+			if (err instanceof TypeError && err.message.includes("fetch")) {
+				setError("Network error. Please check your internet connection.");
+			} else if (err instanceof Error) {
+				setError(`Registration failed: ${err.message}`);
+			} else {
+				setError("An unexpected error occurred. Please try again.");
+			}
+		} finally {
+			setIsLoading(false);
 		}
 	};
 

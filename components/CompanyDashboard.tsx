@@ -37,6 +37,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { Badge } from "@/components/ui/badge";
 import { useState } from "react";
+import Link from "next/link";
 
 const CompanyDashboard = () => {
 	const [activeTab, setActiveTab] = useState("overview");
@@ -133,7 +134,6 @@ const CompanyDashboard = () => {
 
 	const handleSubmit = (e: { preventDefault: () => void }) => {
 		e.preventDefault();
-		console.log("Creating internship:", formData);
 		setShowCreateModal(false);
 		setFormData({
 			title: "",
@@ -186,11 +186,49 @@ const CompanyDashboard = () => {
 			<header className="bg-white shadow-sm border-b">
 				<div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 					<div className="flex justify-between items-center h-16">
-						<div className="flex items-center">
-							<h1 className="text-2xl font-bold text-gray-900">
-								TechCorp Dashboard
-							</h1>
-						</div>
+						<Link href="/">
+							<div className="flex items-center space-x-3">
+								<div className="relative">
+									<svg
+										width="32"
+										height="32"
+										viewBox="0 0 32 32"
+										className="text-slate-800"
+									>
+										<circle
+											cx="12"
+											cy="16"
+											r="8"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2.5"
+											className="text-blue-600"
+										/>
+										<circle
+											cx="20"
+											cy="16"
+											r="8"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2.5"
+											className="text-slate-700"
+										/>
+										<circle
+											cx="16"
+											cy="16"
+											r="2"
+											fill="currentColor"
+											className="text-blue-600"
+										/>
+									</svg>
+								</div>
+								<div className="flex flex-col">
+									<span className="text-xl font-bold text-slate-800 leading-none">
+										InternConnect
+									</span>
+								</div>
+							</div>
+						</Link>
 						<div className="flex items-center space-x-4">
 							<span className="text-gray-700">Welcome back, TechCorp</span>
 							<DropdownMenu>

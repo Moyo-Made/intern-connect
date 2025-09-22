@@ -5,6 +5,7 @@ import { Menu, X, LogIn, UserPlus, Zap } from "lucide-react";
 import LoginModal from "./auth/LoginModal";
 import UserTypeModal from "./UserTypeModal";
 import RegisterModal from "./auth/RegisterModal";
+import Link from "next/link";
 
 interface HeaderProps {
 	showLoginModal: false | "student" | "company" | "select";
@@ -41,47 +42,49 @@ const Header = ({
 				<div className="container mx-auto px-6 py-4">
 					<div className="flex items-center justify-between">
 						{/* Logo */}
-						<div className="flex items-center space-x-3">
-							<div className="relative">
-								<svg
-									width="32"
-									height="32"
-									viewBox="0 0 32 32"
-									className="text-slate-800"
-								>
-									<circle
-										cx="12"
-										cy="16"
-										r="8"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2.5"
-										className="text-blue-600"
-									/>
-									<circle
-										cx="20"
-										cy="16"
-										r="8"
-										fill="none"
-										stroke="currentColor"
-										strokeWidth="2.5"
-										className="text-slate-700"
-									/>
-									<circle
-										cx="16"
-										cy="16"
-										r="2"
-										fill="currentColor"
-										className="text-blue-600"
-									/>
-								</svg>
+						<Link href="/">
+							<div className="flex items-center space-x-3">
+								<div className="relative">
+									<svg
+										width="32"
+										height="32"
+										viewBox="0 0 32 32"
+										className="text-slate-800"
+									>
+										<circle
+											cx="12"
+											cy="16"
+											r="8"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2.5"
+											className="text-blue-600"
+										/>
+										<circle
+											cx="20"
+											cy="16"
+											r="8"
+											fill="none"
+											stroke="currentColor"
+											strokeWidth="2.5"
+											className="text-slate-700"
+										/>
+										<circle
+											cx="16"
+											cy="16"
+											r="2"
+											fill="currentColor"
+											className="text-blue-600"
+										/>
+									</svg>
+								</div>
+								<div className="flex flex-col">
+									<span className="text-xl font-bold text-slate-800 leading-none">
+										InternConnect
+									</span>
+								</div>
 							</div>
-							<div className="flex flex-col">
-								<span className="text-xl font-bold text-slate-800 leading-none">
-									InternConnect
-								</span>
-							</div>
-						</div>
+						</Link>
 
 						{/* Desktop Navigation */}
 						<nav className="hidden md:flex items-center space-x-8">
