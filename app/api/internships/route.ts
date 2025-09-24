@@ -90,3 +90,79 @@ export async function POST(request: NextRequest) {
 		);
 	}
 }
+
+export async function GET(request: NextRequest) {
+	try {
+		const { searchParams } = new URL(request.url);
+		const page = parseInt(searchParams.get("page") || "1");
+		const limit = parseInt(searchParams.get("limit") || "10");
+		const location = searchParams.get("location");
+		const isRemote = searchParams.get("isRemote");
+		
+		const skip = (page - 1) * limit;
+
+		// Build where clause based on filters
+		const where: any = {
+			isActive: true,
+		};
+
+		if (location) {
+			where.location = {
+				contains: location,
+				mode: "insensitive",
+			};
+		}
+
+		if (isRemote !== null) {
+			where.isRemote = isRemote === "true";
+		}
+
+		// Get internships with company info
+		const [internships, total] = await Promise.all([
+			prisma.internship.findMany({
+				where,
+				skip,
+				take: limit,
+				orderBy: {
+					createdAt: "desc",
+				},
+				include: {
+					company: {
+						select: {
+							companyName: true,
+							description: true,
+							location: true,
+						},
+					},
+				},
+			}),
+			prisma.internship.count({ where }),
+		]);
+
+		return Response.json(
+			{
+				success: true,
+				message: "Internships fetched successfully",
+				data: {
+					internships,
+					pagination: {
+						current: page,
+						total: Math.ceil(total / limit),
+						count: internships.length,
+						totalCount: total,
+					},
+				},
+			},
+			{ status: 200 }
+		);
+	} catch (error) {
+		console.error("Get internships error:", error);
+		return Response.json(
+			{
+				success: false,
+				message: "Internal server error. Please try again later.",
+			},
+			{ status: 500 }
+		);
+	}
+}
