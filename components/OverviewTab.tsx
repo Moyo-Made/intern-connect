@@ -1,4 +1,4 @@
-import { applications } from "@/data/data";
+
 import {
 	getApplicationStatusColor,
 	getApplicationStatusIcon,
@@ -7,6 +7,7 @@ import { Building2, CheckCircle, Clock, Users } from "lucide-react";
 import React from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
+import { applications } from "@/data/data";
 
 const OverviewTab = () => {
 	return (
@@ -123,7 +124,7 @@ const OverviewTab = () => {
 										<div className="flex items-center">
 											{getApplicationStatusIcon(app.status)}
 											<Badge
-												className={`ml-2 ${getApplicationStatusColor(app.status)} rounded-full`}
+												className={`ml-2 ${getApplicationStatusColor(app.status)}`}
 											>
 												{app.status.toUpperCase()}
 											</Badge>

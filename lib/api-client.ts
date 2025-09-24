@@ -161,25 +161,53 @@ export const authApi = {
 
 export const applicationsApi = {
 	create: async (applicationData: {
-	  internshipId: string;
-	  coverLetter?: string;
+		internshipId: string;
+		coverLetter?: string;
 	}): Promise<ApiResponse> => {
-	  return authenticatedApiCall("/applications", {
-		method: "POST",
-		body: JSON.stringify(applicationData),
-	  });
+		return authenticatedApiCall("/applications", {
+			method: "POST",
+			body: JSON.stringify(applicationData),
+		});
 	},
-	
+
 	getStatus: async (internshipId: string): Promise<ApiResponse> => {
-	  return authenticatedApiCall(`/applications/status/${internshipId}`, {
-		method: "GET",
-	  });
+		return authenticatedApiCall(`/applications/status/${internshipId}`, {
+			method: "GET",
+		});
 	},
-	
+
 	// Get all user applications
 	getMyApplications: async (): Promise<ApiResponse> => {
-	  return authenticatedApiCall("/applications/my", {
-		method: "GET",
-	  });
-	}
-  };
+		return authenticatedApiCall("/applications/my", {
+			method: "GET",
+		});
+	},
+
+	getCompanyApplications: async (filters?: {
+		page?: number;
+		limit?: number;
+		status?: string;
+	}): Promise<ApiResponse> => {
+		const params = new URLSearchParams();
+		if (filters?.page) params.append("page", filters.page.toString());
+		if (filters?.limit) params.append("limit", filters.limit.toString());
+		if (filters?.status) params.append("status", filters.status);
+
+		const queryString = params.toString();
+		const url = queryString
+			? `/applications/company?${queryString}`
+			: "/applications/company";
+
+		return authenticatedApiCall(url, { method: "GET" });
+	},
+
+	updateStatus: async (
+		applicationId: string,
+		status: string
+	): Promise<ApiResponse> => {
+		return authenticatedApiCall(`/applications/${applicationId}/status`, {
+			method: "PATCH",
+			body: JSON.stringify({ status }),
+		});
+	},
+};

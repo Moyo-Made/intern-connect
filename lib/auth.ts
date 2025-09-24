@@ -59,28 +59,36 @@ export const extractTokenFromHeader = (authHeader: string | undefined): string |
   return authHeader.substring(7) // Remove 'Bearer ' prefix
 }
 
-export async function getStudentIdFromToken(request: NextRequest): Promise<string> {
+export async function getUserFromToken(request: NextRequest, requiredUserType?: 'STUDENT' | 'COMPANY'): Promise<{ userId: string; userType: string }> {
   try {
-    // Get token from Authorization header
     const authHeader = request.headers.get('authorization');
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       throw new Error('No token provided');
     }
     
-    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
-    
-    // Verify and decode token
+    const token = authHeader.substring(7);
     const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
     
-    // Check if user is a student
-    if (decoded.userType !== 'STUDENT') {
-      throw new Error('Only students can apply for internships');
+    if (requiredUserType && decoded.userType !== requiredUserType) {
+      throw new Error(`Only ${requiredUserType.toLowerCase()}s can access this resource`);
     }
     
-    // Return the user ID (which is the studentId in your Application model)
-    return decoded.userId;
+    return {
+      userId: decoded.userId,
+      userType: decoded.userType
+    };
     
   } catch (error) {
     throw new Error('Invalid or expired token');
   }
+}
+
+export async function getStudentIdFromToken(request: NextRequest): Promise<string> {
+  const { userId } = await getUserFromToken(request, 'STUDENT');
+  return userId;
+}
+
+export async function getCompanyIdFromToken(request: NextRequest): Promise<string> {
+  const { userId } = await getUserFromToken(request, 'COMPANY');
+  return userId;
 }
