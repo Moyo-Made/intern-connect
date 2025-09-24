@@ -79,12 +79,51 @@ export const authenticatedApiCall = <T>(
 export const internshipsApi = {
 	// Post new internship
 	create: async (internshipData: InternshipData): Promise<ApiResponse> => {
-	  return authenticatedApiCall("/internships", {
-		method: "POST",
-		body: JSON.stringify(internshipData),
-	  });
+		return authenticatedApiCall("/internships", {
+			method: "POST",
+			body: JSON.stringify(internshipData),
+		});
 	},
-  };
+
+	// Get all internships
+	getAll: async (filters?: {
+		page?: number;
+		limit?: number;
+		location?: string;
+		isRemote?: boolean;
+	}): Promise<ApiResponse> => {
+		const params = new URLSearchParams();
+
+		if (filters?.page) params.append("page", filters.page.toString());
+		if (filters?.limit) params.append("limit", filters.limit.toString());
+		if (filters?.location) params.append("location", filters.location);
+		if (filters?.isRemote !== undefined)
+			params.append("isRemote", filters.isRemote.toString());
+
+		const queryString = params.toString();
+		const url = queryString ? `/internships?${queryString}` : "/internships";
+
+		return authenticatedApiCall(url, {
+			method: "GET",
+		});
+	},
+
+	update: async (
+		id: string,
+		data: Partial<InternshipData>
+	): Promise<ApiResponse> => {
+		return authenticatedApiCall(`/internships/${id}`, {
+			method: "PUT",
+			body: JSON.stringify(data),
+		});
+	},
+
+	delete: async (id: string): Promise<ApiResponse> => {
+		return authenticatedApiCall(`/internships/${id}`, {
+			method: "DELETE",
+		});
+	},
+};
 
 // Auth API functions
 export const authApi = {
@@ -110,8 +149,6 @@ export const authApi = {
 			method: "GET",
 		});
 	},
-
-	
 
 	// Logout user (if you implement server-side logout)
 	logout: async (): Promise<ApiResponse> => {
