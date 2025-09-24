@@ -74,27 +74,3 @@ export const internships = [
 		posted: "5 days ago",
 	},
 ];
-
-export const studentApplications = [
-	{
-		id: 1,
-		internshipTitle: "Frontend Developer Intern",
-		company: "TechCorp",
-		appliedDate: "2024-01-15",
-		status: "PENDING",
-	},
-	{
-		id: 2,
-		internshipTitle: "Data Science Intern",
-		company: "DataFlow Inc",
-		appliedDate: "2024-01-12",
-		status: "ACCEPTED",
-	},
-	{
-		id: 3,
-		internshipTitle: "UX Design Intern",
-		company: "DesignStudio",
-		appliedDate: "2024-01-10",
-		status: "REJECTED",
-	},
-];

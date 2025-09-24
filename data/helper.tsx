@@ -48,6 +48,6 @@ export const formatDate = (isoDate: string | number | Date) => {
 	const day = date.getDate();
 	const month = date.toLocaleDateString('en-US', { month: 'long' });
 	const year = date.getFullYear();
-	return `${day}, ${month}, ${year}`;
+	return `${day} ${month}, ${year}`;
   };
   
