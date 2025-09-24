@@ -98,6 +98,7 @@ export async function GET(request: NextRequest) {
 		const limit = parseInt(searchParams.get("limit") || "10");
 		const location = searchParams.get("location");
 		const isRemote = searchParams.get("isRemote");
+		const search = searchParams.get("search");
 		
 		const skip = (page - 1) * limit;
 
@@ -116,6 +117,25 @@ export async function GET(request: NextRequest) {
 		if (isRemote !== null) {
 			where.isRemote = isRemote === "true";
 		}
+		
+		if (search) {
+			where.OR = [
+			  {
+				title: {
+				  contains: search,
+				  mode: "insensitive",
+				},
+			  },
+			  {
+				company: {
+				  companyName: {
+					contains: search,
+					mode: "insensitive",
+				  },
+				},
+			  },
+			];
+		  }
 
 		// Get internships with company info
 		const [internships, total] = await Promise.all([

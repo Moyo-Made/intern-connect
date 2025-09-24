@@ -32,7 +32,7 @@ export interface CompanyProfile {
 	description?: string;
 	companySize: string;
 	logoUrl?: string;
-	phoneNumber?: number
+	phoneNumber?: number;
 }
 
 export interface AuthUser {
@@ -45,4 +45,25 @@ export interface AuthState {
 	isLoading: boolean;
 	isAuthenticated: boolean;
 	error: string | null;
+}
+
+export interface Company {
+	companyName: string;
+}
+
+export interface Internship {
+	id: string;
+	title: string;
+	company: Company | string;
+}
+
+export interface ApplyModalProps {
+	internship: Internship;
+	isOpen: boolean;
+	onClose: () => void;
+}
+
+export interface ApplicationData {
+	internshipId: string;
+	coverLetter?: string;
 }

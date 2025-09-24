@@ -6,6 +6,17 @@ export const getStatusColor = (isActive: boolean) => {
 		: "bg-gray-100 text-gray-800 rounded-full";
 };
 
+export const getStatusIcon = (status: string) => {
+	switch (status) {
+		case "ACCEPTED":
+			return <CheckCircle className="w-4 h-4 text-green-500" />;
+		case "REJECTED":
+			return <XCircle className="w-4 h-4 text-red-500" />;
+		default:
+			return <Clock className="w-4 h-4 text-yellow-500" />;
+	}
+};
+
 export const getApplicationStatusColor = (status: string) => {
 	switch (status) {
 		case "accepted":

@@ -91,6 +91,7 @@ export const internshipsApi = {
 		limit?: number;
 		location?: string;
 		isRemote?: boolean;
+		search?: string;
 	}): Promise<ApiResponse> => {
 		const params = new URLSearchParams();
 
@@ -99,6 +100,7 @@ export const internshipsApi = {
 		if (filters?.location) params.append("location", filters.location);
 		if (filters?.isRemote !== undefined)
 			params.append("isRemote", filters.isRemote.toString());
+		if (filters?.search) params.append("search", filters.search);
 
 		const queryString = params.toString();
 		const url = queryString ? `/internships?${queryString}` : "/internships";
@@ -156,3 +158,28 @@ export const authApi = {
 		});
 	},
 };
+
+export const applicationsApi = {
+	create: async (applicationData: {
+	  internshipId: string;
+	  coverLetter?: string;
+	}): Promise<ApiResponse> => {
+	  return authenticatedApiCall("/applications", {
+		method: "POST",
+		body: JSON.stringify(applicationData),
+	  });
+	},
+	
+	getStatus: async (internshipId: string): Promise<ApiResponse> => {
+	  return authenticatedApiCall(`/applications/status/${internshipId}`, {
+		method: "GET",
+	  });
+	},
+	
+	// Get all user applications
+	getMyApplications: async (): Promise<ApiResponse> => {
+	  return authenticatedApiCall("/applications/my", {
+		method: "GET",
+	  });
+	}
+  };

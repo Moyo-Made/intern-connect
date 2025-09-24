@@ -1,6 +1,7 @@
 import bcrypt from 'bcryptjs'
 import jwt from 'jsonwebtoken'
 import { UserType } from '@prisma/client'
+import { NextRequest } from 'next/server'
 
 // Types
 export interface JWTPayload {
@@ -56,4 +57,30 @@ export const extractTokenFromHeader = (authHeader: string | undefined): string |
   }
   
   return authHeader.substring(7) // Remove 'Bearer ' prefix
+}
+
+export async function getStudentIdFromToken(request: NextRequest): Promise<string> {
+  try {
+    // Get token from Authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      throw new Error('No token provided');
+    }
+    
+    const token = authHeader.substring(7); // Remove 'Bearer ' prefix
+    
+    // Verify and decode token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any;
+    
+    // Check if user is a student
+    if (decoded.userType !== 'STUDENT') {
+      throw new Error('Only students can apply for internships');
+    }
+    
+    // Return the user ID (which is the studentId in your Application model)
+    return decoded.userId;
+    
+  } catch (error) {
+    throw new Error('Invalid or expired token');
+  }
 }
