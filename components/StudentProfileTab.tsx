@@ -1,7 +1,40 @@
+"use client";
+
+import { useQuery } from "@tanstack/react-query";
+import { authApi } from "@/lib/api-client";
+import { StudentProfile } from "@/types/interface";
 import { FileText } from "lucide-react";
-import { AuthUser, CompanyProfile } from "@/types/interface";
 
 const StudentProfileTab = () => {
+	const {
+		data: userData,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: ["user-profile"],
+		queryFn: authApi.me,
+		select: (response) => (response.success ? response.data : null),
+		staleTime: 10 * 60 * 1000, // 10 minutes
+	});
+
+	if (isLoading) {
+		return (
+			<div className="flex flex-col justify-center items-center py-8">
+				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+				Loading profile...
+			</div>
+		);
+	}
+
+	if (error) {
+		return (
+			<div className="bg-red-50 border border-red-200 rounded-md p-4">
+				<div className="text-red-800">
+					Failed to load profile data. Please try again.
+				</div>
+			</div>
+		);
+	}
 	return (
 		<div>
 			<h2 className="text-2xl font-bold text-gray-900 mb-6">Profile</h2>
@@ -18,7 +51,11 @@ const StudentProfileTab = () => {
 							</label>
 							<input
 								type="text"
-								defaultValue="Alex"
+								defaultValue={
+									userData?.user.userType === "STUDENT"
+										? (userData.profile as StudentProfile).firstName || ""
+										: ""
+								}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							/>
 						</div>
@@ -28,7 +65,11 @@ const StudentProfileTab = () => {
 							</label>
 							<input
 								type="text"
-								defaultValue="Johnson"
+								defaultValue={
+									userData?.user.userType === "STUDENT"
+										? (userData.profile as StudentProfile).lastName || ""
+										: ""
+								}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							/>
 						</div>
@@ -38,7 +79,7 @@ const StudentProfileTab = () => {
 							</label>
 							<input
 								type="email"
-								defaultValue="alex.johnson@email.com"
+								defaultValue={userData?.user?.email || ""}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							/>
 						</div>
@@ -48,7 +89,11 @@ const StudentProfileTab = () => {
 							</label>
 							<input
 								type="tel"
-								defaultValue="+1 (555) 123-4567"
+								defaultValue={
+									userData?.user.userType === "STUDENT"
+										? (userData.profile as StudentProfile).phone || ""
+										: ""
+								}
 								className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 							/>
 						</div>
@@ -59,7 +104,11 @@ const StudentProfileTab = () => {
 						</label>
 						<input
 							type="text"
-							defaultValue="Stanford University"
+							defaultValue={
+								userData?.user.userType === "STUDENT"
+									? (userData.profile as StudentProfile).university || ""
+									: ""
+							}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 						/>
 					</div>
@@ -69,7 +118,11 @@ const StudentProfileTab = () => {
 						</label>
 						<input
 							type="text"
-							defaultValue="Computer Science"
+							defaultValue={
+								userData?.user.userType === "STUDENT"
+									? (userData.profile as StudentProfile).major || ""
+									: ""
+							}
 							className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent"
 						/>
 					</div>
@@ -81,16 +134,17 @@ const StudentProfileTab = () => {
 						<h3 className="text-lg font-medium text-gray-900 mb-4">Skills</h3>
 						<div className="space-y-2">
 							<div className="flex flex-wrap gap-2">
-								{["JavaScript", "React", "Python", "SQL", "Git", "Node.js"].map(
-									(skill, index) => (
-										<span
-											key={index}
-											className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm"
-										>
-											{skill}
-										</span>
-									)
-								)}
+								{(userData?.user.userType === "STUDENT"
+									? (userData.profile as StudentProfile).skills || []
+									: []
+								).map((skill, index) => (
+									<span
+										key={index}
+										className="bg-blue-100 text-blue-800 px-2 py-1 rounded text-sm"
+									>
+										{skill}
+									</span>
+								))}
 							</div>
 							<button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
 								+ Add Skill
@@ -103,7 +157,11 @@ const StudentProfileTab = () => {
 						<div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
 							<FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
 							<p className="text-sm text-gray-600 mb-2">
-								Alex_Johnson_Resume.pdf
+								{userData?.user.userType === "STUDENT"
+									? (userData.profile as StudentProfile).resumeUrl
+										? "Resume uploaded"
+										: "No resume uploaded"
+									: "No resume uploaded"}
 							</p>
 							<button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
 								Update Resume

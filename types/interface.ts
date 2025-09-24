@@ -21,6 +21,7 @@ export interface StudentProfile {
 	portfolioUrl?: string;
 	linkedinUrl?: string;
 	githubUrl?: string;
+	skills: string[]
 }
 
 export interface CompanyProfile {

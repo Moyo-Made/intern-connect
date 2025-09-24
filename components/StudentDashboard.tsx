@@ -13,8 +13,7 @@ import {
 import { Button } from "./ui/button";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { AuthUser, StudentProfile } from "@/types/interface";
-import { authApi } from "@/lib/api-client";
+import { StudentProfile } from "@/types/interface";
 import { useAuth } from "@/contexts/AuthContext";
 import StudentProfileTab from "./StudentProfileTab";
 import FindInternship from "./FindInternships";
@@ -22,9 +21,7 @@ import StudentsApplication from "./StudentsApplicationTab";
 
 const StudentDashboard = () => {
 	const [activeTab, setActiveTab] = useState("internships");
-	const [userData, setUserData] = useState<AuthUser | null>(null);
 	const router = useRouter();
-	const [isLoading, setIsLoading] = useState(true);
 	const { user, isAuthenticated, logout, isLoading: authLoading } = useAuth();
 
 	useEffect(() => {
@@ -42,23 +39,6 @@ const StudentDashboard = () => {
 		}
 	}, [authLoading, isAuthenticated, user, router]);
 
-	useEffect(() => {
-		const fetchUserData = async () => {
-			try {
-				setIsLoading(true);
-				const response = await authApi.me();
-				if (response.success) {
-					setUserData(response.data);
-				}
-			} catch (error) {
-				console.error("Failed to fetch user data:", error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
-
-		fetchUserData();
-	}, []);
 
 	const handleLogout = () => {
 		logout();
@@ -116,7 +96,7 @@ const StudentDashboard = () => {
 						</Link>
 						<div className="flex items-center space-x-4">
 							<span className="text-gray-700">
-								{isLoading
+								{authLoading
 									? "Loading..."
 									: `Welcome back, ${
 											user?.user.userType === "STUDENT"

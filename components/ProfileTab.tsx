@@ -3,32 +3,42 @@
 import { Building2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
-import { useEffect, useState } from "react";
-import { AuthUser, CompanyProfile } from "@/types/interface";
+import { CompanyProfile } from "@/types/interface";
 import { authApi } from "@/lib/api-client";
 import { Textarea } from "./ui/textarea";
+import { useQuery } from "@tanstack/react-query";
 
 const ProfileTab = () => {
-	const [userData, setUserData] = useState<AuthUser | null>(null);
-	const [isLoading, setIsLoading] = useState(true);
+	const {
+		data: userData,
+		isLoading,
+		error,
+	} = useQuery({
+		queryKey: ["user-profile"],
+		queryFn: authApi.me,
+		select: (response) => (response.success ? response.data : null),
+		staleTime: 10 * 60 * 1000, // 10 minutes
+	});
 
-	useEffect(() => {
-		const fetchUserData = async () => {
-			try {
-				setIsLoading(true);
-				const response = await authApi.me();
-				if (response.success) {
-					setUserData(response.data);
-				}
-			} catch (error) {
-				console.error("Failed to fetch user data:", error);
-			} finally {
-				setIsLoading(false);
-			}
-		};
+	if (isLoading) {
+		return (
+			<div className="flex flex-col justify-center items-center py-8">
+				<div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+				Loading profile...
+			</div>
+		);
+	}
 
-		fetchUserData();
-	}, []);
+	if (error) {
+		return (
+			<div className="bg-red-50 border border-red-200 rounded-md p-4">
+				<div className="text-red-800">
+					Failed to load profile data. Please try again.
+				</div>
+			</div>
+		);
+	}
+
 	return (
 		<div>
 			<h2 className="text-2xl font-bold text-gray-900 mb-6">Company Profile</h2>
@@ -57,19 +67,7 @@ const ProfileTab = () => {
 							</label>
 							<Input type="email" defaultValue={userData?.user?.email || ""} />
 						</div>
-						<div>
-							<label className="block text-sm font-medium text-gray-700 mb-1">
-								Phone
-							</label>
-							<Input
-								type="tel"
-								defaultValue={
-									userData?.user.userType === "COMPANY"
-										? (userData.profile as CompanyProfile).phoneNumber || ""
-										: ""
-								}
-							/>
-						</div>
+
 						<div>
 							<label className="block text-sm font-medium text-gray-700 mb-1">
 								Website
