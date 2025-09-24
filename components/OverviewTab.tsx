@@ -1,11 +1,14 @@
 import { applications } from "@/data/data";
-import { getApplicationStatusColor, getApplicationStatusIcon } from "@/data/helper";
-import { Badge, Building2, CheckCircle, Clock, Users } from "lucide-react";
+import {
+	getApplicationStatusColor,
+	getApplicationStatusIcon,
+} from "@/data/helper";
+import { Building2, CheckCircle, Clock, Users } from "lucide-react";
 import React from "react";
 import { Button } from "./ui/button";
+import { Badge } from "./ui/badge";
 
 const OverviewTab = () => {
-	
 	return (
 		<div>
 			<div className="mb-8">
@@ -120,14 +123,14 @@ const OverviewTab = () => {
 										<div className="flex items-center">
 											{getApplicationStatusIcon(app.status)}
 											<Badge
-												className={`ml-2 ${getApplicationStatusColor(app.status)}`}
+												className={`ml-2 ${getApplicationStatusColor(app.status)} rounded-full`}
 											>
 												{app.status.toUpperCase()}
 											</Badge>
 										</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-										<Button variant="ghost" size="sm">
+										<Button variant="ghost" size="sm" className="cursor-pointer">
 											View
 										</Button>
 									</td>

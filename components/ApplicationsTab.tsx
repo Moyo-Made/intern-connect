@@ -62,7 +62,7 @@ const ApplicationsTab = () => {
 										<div className="flex items-center">
 											{getApplicationStatusIcon(app.status)}
 											<Badge
-												className={`ml-2 ${getApplicationStatusColor(app.status)}`}
+												className={`ml-2 ${getApplicationStatusColor(app.status)} rounded-full`}
 											>
 												{app.status.toUpperCase()}
 											</Badge>

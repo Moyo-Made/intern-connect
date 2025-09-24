@@ -25,10 +25,8 @@ import ProfileTab from "./ProfileTab";
 const CompanyDashboard = () => {
 	const [activeTab, setActiveTab] = useState("overview");
 
-	const [userData] = useState<AuthUser | null>(null);
 	const router = useRouter();
 
-	const [isLoading, setIsLoading] = useState(true);
 	const { user, isAuthenticated, logout, isLoading: authLoading } = useAuth();
 
 	useEffect(() => {
@@ -102,13 +100,18 @@ const CompanyDashboard = () => {
 						</Link>
 						<div className="flex items-center space-x-4">
 							<span className="text-gray-700">
-								{isLoading
-									? "Loading..."
-									: `Welcome back, ${
-											userData?.user.userType === "COMPANY"
-												? (userData.profile as CompanyProfile).companyName
-												: userData?.user?.email || "User"
-										}`}
+								{authLoading ? (
+									<div className="flex items-center space-x-2">
+										<div className="h-4 bg-gray-200 rounded animate-pulse w-24"></div>
+										<div className="h-4 bg-gray-200 rounded animate-pulse w-32"></div>
+									</div>
+								) : (
+									`Welcome back, ${
+										user?.user.userType === "COMPANY"
+											? (user.profile as CompanyProfile).companyName
+											: user?.user?.email || "User"
+									}`
+								)}
 							</span>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
@@ -121,8 +124,8 @@ const CompanyDashboard = () => {
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-56">
 									<DropdownMenuLabel>
-										{userData?.user.userType === "COMPANY"
-											? (userData.profile as CompanyProfile).companyName
+										{user?.user.userType === "COMPANY"
+											? (user.profile as CompanyProfile).companyName
 											: "User"}
 									</DropdownMenuLabel>
 									<DropdownMenuSeparator />
@@ -179,7 +182,9 @@ const CompanyDashboard = () => {
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{activeTab === "overview" && <OverviewTab />}
 
-				{activeTab === "internships" && <InternshipsTab onTabChange={setActiveTab} />}
+				{activeTab === "internships" && (
+					<InternshipsTab onTabChange={setActiveTab} />
+				)}
 
 				{activeTab === "applications" && <ApplicationsTab />}
 

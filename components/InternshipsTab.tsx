@@ -18,7 +18,7 @@ import { internshipsApi } from "@/lib/api-client";
 import toast from "react-hot-toast";
 import { InternshipData } from "@/lib/validation";
 import { Internship } from "@prisma/client";
-import { getStatusColor } from "@/data/helper";
+import { formatDate, getStatusColor } from "@/data/helper";
 
 interface InternshipsTabProps {
 	onTabChange: (tab: string) => void;
@@ -34,7 +34,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 		description: "",
 		location: "",
 		requirements: "",
-		duration: "3 months",
+		duration: "",
 		stipend: "",
 	});
 	const [showCreateModal, setShowCreateModal] = useState(false);
@@ -110,7 +110,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 				description: "",
 				location: "",
 				requirements: "",
-				duration: "3 months",
+				duration: "",
 				stipend: "",
 			});
 		} catch (error: any) {
@@ -144,7 +144,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 				description: "",
 				location: "",
 				requirements: "",
-				duration: "3 months",
+				duration: "",
 				stipend: "",
 			});
 		} catch (error: any) {
@@ -158,7 +158,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 					<h2 className="text-2xl font-bold text-gray-900">My Internships</h2>
 					<Button
 						onClick={() => setShowCreateModal(true)}
-						className="flex items-center space-x-2"
+						className="flex items-center space-x-0.5 cursor-pointer"
 					>
 						<Plus className="w-4 h-4" />
 						<span>Post New Internship</span>
@@ -193,7 +193,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 											</div>
 											<div className="flex items-center">
 												<Calendar className="w-4 h-4 mr-1" />
-												<span>Posted {internship.posted}</span>
+												<span>Posted {formatDate(internship.createdAt)}</span>
 											</div>
 											<div className="flex items-center">
 												<Users className="w-4 h-4 mr-1" />
@@ -220,6 +220,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 												});
 												setShowEditModal(true);
 											}}
+											className="cursor-pointer"
 										>
 											<Edit className="w-4 h-4 mr-1" />
 											Edit
@@ -228,6 +229,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 											variant="outline"
 											size="sm"
 											onClick={() => onTabChange("applications")}
+											className="cursor-pointer"
 										>
 											<Eye className="w-4 h-4 mr-1" />
 											View Applications
@@ -235,7 +237,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 										<Button
 											variant="outline"
 											size="sm"
-											className="text-red-600 hover:text-red-700"
+											className="text-red-600 hover:text-red-700 cursor-pointer"
 											onClick={() => {
 												if (
 													confirm(
@@ -320,7 +322,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 										}
 									>
 										<SelectTrigger>
-											<SelectValue />
+											<SelectValue placeholder="Select duration"  />
 										</SelectTrigger>
 										<SelectContent>
 											<SelectItem value="3-months">3 months</SelectItem>
@@ -361,6 +363,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 									type="button"
 									variant="outline"
 									onClick={() => setShowCreateModal(false)}
+									className="cursor-pointer"
 								>
 									Cancel
 								</Button>
@@ -368,6 +371,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 									type="button"
 									onClick={handleSubmit}
 									disabled={createInternshipMutation.isPending}
+									className="cursor-pointer"
 								>
 									{createInternshipMutation.isPending
 										? "Posting..."
@@ -421,6 +425,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 										Duration
 									</label>
 									<Select
+									
 										value={formData.duration}
 										onValueChange={(value) =>
 											setFormData((prev) => ({
@@ -474,6 +479,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 										setShowEditModal(false);
 										setEditingInternship(null);
 									}}
+									className="cursor-pointer"
 								>
 									Cancel
 								</Button>
@@ -481,6 +487,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 									type="button"
 									onClick={handleEditSubmit}
 									disabled={updateInternshipMutation.isPending}
+									className="cursor-pointer"
 								>
 									{updateInternshipMutation.isPending
 										? "Updating..."

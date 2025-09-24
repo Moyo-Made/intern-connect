@@ -4,10 +4,7 @@ import { verifyToken } from "@/lib/auth";
 import { internshipSchema } from "@/lib/validation";
 
 // PUT - Update internship
-export async function PUT(
-	request: NextRequest,
-	{ params }: { params: { id: string } }
-) {
+export async function PUT(request: NextRequest, { params }: any) {
 	try {
 		// Get and verify token
 		const authHeader = request.headers.get("Authorization");
@@ -124,10 +121,7 @@ export async function PUT(
 }
 
 // DELETE - Delete internship
-export async function DELETE(
-	request: NextRequest,
-	{ params }: { params: { id: string } }
-) {
+export async function DELETE(request: NextRequest, { params }: any) {
 	try {
 		// Get and verify token
 		const authHeader = request.headers.get("Authorization");
@@ -224,10 +218,10 @@ export async function DELETE(
 	}
 }
 
-// GET - Get single internship (optional - for viewing details)
+// GET - Get single internship (for viewing details)
 export async function GET(
 	request: NextRequest,
-	{ params }: { params: { id: string } }
+	{ params }: any
 ) {
 	try {
 		const internshipId = params.id;

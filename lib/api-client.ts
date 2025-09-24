@@ -150,7 +150,6 @@ export const authApi = {
 		});
 	},
 
-	// Logout user (if you implement server-side logout)
 	logout: async (): Promise<ApiResponse> => {
 		return apiCall("/auth/logout", {
 			method: "POST",
