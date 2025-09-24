@@ -179,7 +179,7 @@ const CompanyDashboard = () => {
 			<main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
 				{activeTab === "overview" && <OverviewTab />}
 
-				{activeTab === "internships" && <InternshipsTab />}
+				{activeTab === "internships" && <InternshipsTab onTabChange={setActiveTab} />}
 
 				{activeTab === "applications" && <ApplicationsTab />}
 

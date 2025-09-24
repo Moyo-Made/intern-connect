@@ -20,8 +20,12 @@ import { InternshipData } from "@/lib/validation";
 import { Internship } from "@prisma/client";
 import { getStatusColor } from "@/data/helper";
 
-const InternshipsTab = () => {
-	const [activeTab, setActiveTab] = useState("overview");
+interface InternshipsTabProps {
+	onTabChange: (tab: string) => void;
+  }
+  
+
+const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 	const [showEditModal, setShowEditModal] = useState(false);
 	const [editingInternship, setEditingInternship] = useState<Internship | null>(
 		null
@@ -222,7 +226,7 @@ const InternshipsTab = () => {
 										<Button
 											variant="outline"
 											size="sm"
-											onClick={() => setActiveTab("applications")}
+											onClick={() => onTabChange("applications")}
 										>
 											<Eye className="w-4 h-4 mr-1" />
 											View Applications
@@ -265,7 +269,7 @@ const InternshipsTab = () => {
 
 			{/* Create Internship Modal */}
 			{showCreateModal && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+				<div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center p-4 z-50">
 					<div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 						<div className="px-6 py-4 border-b border-gray-200">
 							<h3 className="text-lg font-medium text-gray-900">
@@ -286,20 +290,21 @@ const InternshipsTab = () => {
 									required
 								/>
 							</div>
-							<div>
-								<label className="block text-sm font-medium text-gray-700 mb-1">
-									Location
-								</label>
-								<Input
-									type="text"
-									name="location"
-									value={formData.location}
-									onChange={handleInputChange}
-									placeholder="e.g. San Francisco, CA or Remote"
-									required
-								/>
-							</div>
 							<div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+								<div>
+									<label className="block text-sm font-medium text-gray-700 mb-1">
+										Location
+									</label>
+									<Input
+										type="text"
+										name="location"
+										value={formData.location}
+										onChange={handleInputChange}
+										placeholder="e.g. San Francisco, CA or Remote"
+										required
+									/>
+								</div>
+
 								<div>
 									<label className="block text-sm font-medium text-gray-700 mb-1">
 										Duration
@@ -322,22 +327,6 @@ const InternshipsTab = () => {
 											<SelectItem value="12-months">12 months</SelectItem>
 										</SelectContent>
 									</Select>
-								</div>
-
-								<div>
-									<label className="block text-sm font-medium text-gray-700 mb-1">
-										Monthly Stipend (optional)
-									</label>
-									<Input
-										type="number"
-										name="stipend"
-										value={formData.stipend}
-										onChange={handleInputChange}
-										placeholder="e.g. 1500"
-									/>
-									<p className="text-xs text-gray-500 mt-1">
-										Amount in your local currency
-									</p>
 								</div>
 							</div>
 							<div>
@@ -391,7 +380,7 @@ const InternshipsTab = () => {
 
 			{/* Edit Internship Modal */}
 			{showEditModal && (
-				<div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+				<div className="fixed inset-0 backdrop-blur-sm bg-white/10 flex items-center justify-center p-4 z-50">
 					<div className="bg-white rounded-lg shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
 						<div className="px-6 py-4 border-b border-gray-200">
 							<h3 className="text-lg font-medium text-gray-900">
