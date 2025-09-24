@@ -2,10 +2,17 @@
 
 import { useState } from "react";
 import { X, Loader2 } from "lucide-react";
-import { UserType, CompanySize } from "@prisma/client";
+import { UserType } from "@prisma/client";
 import z from "zod";
 import { registrationSchema } from "@/lib/validation";
 import { useRouter } from "next/navigation";
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
 
 interface RegisterModalProps {
 	isOpen: boolean;
@@ -16,6 +23,14 @@ interface RegisterModalProps {
 }
 
 type RegistrationData = z.infer<typeof registrationSchema>;
+
+enum CompanySize {
+	STARTUP = "STARTUP",
+	SMALL = "SMALL",
+	MEDIUM = "MEDIUM",
+	LARGE = "LARGE",
+	ENTERPRISE = "ENTERPRISE",
+}
 
 export default function RegisterModal({
 	isOpen,
@@ -301,22 +316,29 @@ export default function RegisterModal({
 					<label className="block text-sm font-medium text-gray-700 mb-2">
 						Graduation Year *
 					</label>
-					<select
-						name="graduationYear"
-						value={formData.graduationYear}
-						onChange={handleInputChange}
-						className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-						required
+					<Select
+						value={formData.graduationYear?.toString() || ""}
+						onValueChange={(value) =>
+							setFormData((prev) => ({
+								...prev,
+								graduationYear: parseInt(value),
+							}))
+						}
 					>
-						{Array.from({ length: 7 }, (_, i) => {
-							const year = new Date().getFullYear() + i;
-							return (
-								<option key={year} value={year}>
-									{year}
-								</option>
-							);
-						})}
-					</select>
+						<SelectTrigger className="w-full">
+							<SelectValue placeholder="Select graduation year" />
+						</SelectTrigger>
+						<SelectContent>
+							{Array.from({ length: 7 }, (_, i) => {
+								const year = new Date().getFullYear() + i;
+								return (
+									<SelectItem key={year} value={year.toString()}>
+										{year}
+									</SelectItem>
+								);
+							})}
+						</SelectContent>
+					</Select>
 					{validationErrors.graduationYear && (
 						<p className="text-red-500 text-sm mt-1">
 							{validationErrors.graduationYear}
@@ -368,22 +390,28 @@ export default function RegisterModal({
 					<label className="block text-sm font-medium text-gray-700 mb-2">
 						Industry *
 					</label>
-					<select
-						name="industry"
+					<Select
 						value={formData.industry}
-						onChange={handleInputChange}
-						className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-						required
+						onValueChange={(value) =>
+							setFormData((prev) => ({
+								...prev,
+								industry: value,
+							}))
+						}
 					>
-						<option value="">Select industry</option>
-						<option value="Technology">Technology</option>
-						<option value="Finance">Finance</option>
-						<option value="Healthcare">Healthcare</option>
-						<option value="Education">Education</option>
-						<option value="Marketing">Marketing</option>
-						<option value="Manufacturing">Manufacturing</option>
-						<option value="Other">Other</option>
-					</select>
+						<SelectTrigger className="w-full">
+							<SelectValue placeholder="Select industry" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value="Technology">Technology</SelectItem>
+							<SelectItem value="Finance">Finance</SelectItem>
+							<SelectItem value="Healthcare">Healthcare</SelectItem>
+							<SelectItem value="Education">Education</SelectItem>
+							<SelectItem value="Marketing">Marketing</SelectItem>
+							<SelectItem value="Manufacturing">Manufacturing</SelectItem>
+							<SelectItem value="Other">Other</SelectItem>
+						</SelectContent>
+					</Select>
 					{validationErrors.industry && (
 						<p className="text-red-500 text-sm mt-1">
 							{validationErrors.industry}
@@ -395,19 +423,34 @@ export default function RegisterModal({
 					<label className="block text-sm font-medium text-gray-700 mb-2">
 						Company Size *
 					</label>
-					<select
-						name="companySize"
+					<Select
 						value={formData.companySize}
-						onChange={handleInputChange}
-						className="w-full px-4 py-3 text-black border border-gray-300 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-						required
+						onValueChange={(value) =>
+							setFormData((prev) => ({
+								...prev,
+								companySize: value as CompanySize,
+							}))
+						}
 					>
-						<option value={CompanySize.STARTUP}>Startup (1-10)</option>
-						<option value={CompanySize.SMALL}>Small (11-50)</option>
-						<option value={CompanySize.MEDIUM}>Medium (51-200)</option>
-						<option value={CompanySize.LARGE}>Large (201-1000)</option>
-						<option value={CompanySize.ENTERPRISE}>Enterprise (1000+)</option>
-					</select>
+						<SelectTrigger className="w-full">
+							<SelectValue placeholder="Select company size" />
+						</SelectTrigger>
+						<SelectContent>
+							<SelectItem value={CompanySize.STARTUP}>
+								Startup (1-10)
+							</SelectItem>
+							<SelectItem value={CompanySize.SMALL}>Small (11-50)</SelectItem>
+							<SelectItem value={CompanySize.MEDIUM}>
+								Medium (51-200)
+							</SelectItem>
+							<SelectItem value={CompanySize.LARGE}>
+								Large (201-1000)
+							</SelectItem>
+							<SelectItem value={CompanySize.ENTERPRISE}>
+								Enterprise (1000+)
+							</SelectItem>
+						</SelectContent>
+					</Select>
 				</div>
 			</div>
 

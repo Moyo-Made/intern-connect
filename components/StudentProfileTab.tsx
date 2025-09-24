@@ -1,5 +1,5 @@
 import { FileText } from "lucide-react";
-import React from "react";
+import { AuthUser, CompanyProfile } from "@/types/interface";
 
 const StudentProfileTab = () => {
 	return (
