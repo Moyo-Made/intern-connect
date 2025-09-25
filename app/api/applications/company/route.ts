@@ -36,6 +36,7 @@ export async function GET(request: NextRequest) {
 			  lastName: true,
 			  university: true,
 			  major: true,
+			  resumeUrl: true,
 			  user: {
 				select: {
 				  email: true,
@@ -64,6 +65,7 @@ export async function GET(request: NextRequest) {
 		major: app.student.major,
 		internshipTitle: app.internship.title,
 		studentId: app.student.userId,
+		resumeUrl: app.student.resumeUrl,
 	  }));
 	  
 	  return Response.json({

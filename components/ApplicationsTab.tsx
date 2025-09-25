@@ -1,3 +1,5 @@
+"use client";
+
 import {
 	formatDate,
 	getApplicationStatusColor,
@@ -5,14 +7,16 @@ import {
 } from "@/data/helper";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import {
-	useMutation,
-	useQuery,
-	useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { applicationsApi } from "@/lib/api-client";
+import { useState } from "react";
+import toast from "react-hot-toast";
 
 const ApplicationsTab = () => {
+	const [selectedResumeUrl, setSelectedResumeUrl] = useState<string | null>(
+		null
+	);
+	const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
 	const queryClient = useQueryClient();
 
 	const {
@@ -58,6 +62,31 @@ const ApplicationsTab = () => {
 			</div>
 		);
 	}
+
+	const ResumeModal = () =>
+		isResumeModalOpen && (
+			<div className="fixed inset-0 backdrop-blur-sm bg-opacity-50 flex items-center justify-center z-50">
+				<div className="bg-white p-6 rounded-lg max-w-4xl max-h-[90vh] w-full mx-4">
+					<div className="flex justify-between items-center mb-4">
+						<h3 className="text-lg font-medium">Student Resume</h3>
+						<Button variant="ghost" onClick={() => setIsResumeModalOpen(false)}>
+							✕
+						</Button>
+					</div>
+					<div className="h-[70vh]">
+						{selectedResumeUrl ? (
+							<iframe
+								src={selectedResumeUrl}
+								className="w-full h-full border rounded"
+								title="Student Resume"
+							/>
+						) : (
+							<p>No resume available</p>
+						)}
+					</div>
+				</div>
+			</div>
+		);
 
 	return (
 		<div>
@@ -121,7 +150,23 @@ const ApplicationsTab = () => {
 										</div>
 									</td>
 									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium space-x-2">
-										<Button variant="ghost" size="sm">
+										<Button
+											variant="ghost"
+											size="sm"
+											onClick={() => {
+												if (app.resumeUrl) {
+													setSelectedResumeUrl(app.resumeUrl);
+													setIsResumeModalOpen(true);
+												} else {
+													toast.error("No resume available for this student");
+												}
+											}}
+											className={
+												app.resumeUrl
+													? "cursor-pointer"
+													: "cursor-not-allowed opacity-50"
+											}
+										>
 											View Resume
 										</Button>
 										{app.status === "pending" && (
@@ -167,6 +212,7 @@ const ApplicationsTab = () => {
 					</table>
 				</div>
 			</div>
+			<ResumeModal />
 		</div>
 	);
 };

@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { X, Send, Loader2 } from 'lucide-react';
 import { applicationsApi } from '@/lib/api-client';
 import { ApplicationData, ApplyModalProps } from '@/types/interface';
+import toast from 'react-hot-toast';
 
 
 const ApplyModal: React.FC<ApplyModalProps> = ({ internship, isOpen, onClose }) => {
@@ -12,8 +13,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ internship, isOpen, onClose }) 
   const applyMutation = useMutation({
     mutationFn: applicationsApi.create,
     onSuccess: (data: any) => {
-      // Show success message
-      alert('Application submitted successfully!');
+      toast.success('Application submitted successfully!');
       
       // Invalidate queries to update UI
       queryClient.invalidateQueries({ queryKey: ['internship-status', internship.id] });
@@ -26,7 +26,7 @@ const ApplyModal: React.FC<ApplyModalProps> = ({ internship, isOpen, onClose }) 
     onError: (error: any) => {
       // Handle error
       const message = error?.response?.data?.message || 'Failed to submit application';
-      alert(message);
+      toast.success(message);
     }
   });
 

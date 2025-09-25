@@ -118,9 +118,10 @@ const FindInternship = () => {
 							<SelectContent>
 								<SelectItem value="all">All Locations</SelectItem>
 								<SelectItem value="remote">Remote</SelectItem>
-								<SelectItem value="san francisco">San Francisco</SelectItem>
-								<SelectItem value="new york">New York</SelectItem>
-								<SelectItem value="austin">Austin</SelectItem>
+								<SelectItem value="lagos">Lagos</SelectItem>
+								<SelectItem value="abuja">Abuja</SelectItem>
+								<SelectItem value="ilorin">Ilorin</SelectItem>
+
 							</SelectContent>
 						</Select>
 					</div>
