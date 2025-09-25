@@ -1,3 +1,4 @@
+import { CompanyProfile } from "@/types/interface";
 import { RegistrationData, LoginData, InternshipData } from "./validation";
 
 const API_BASE = "/api";
@@ -214,8 +215,29 @@ export const applicationsApi = {
 
 export const dashboardApi = {
 	getStats: async (): Promise<ApiResponse> => {
-	  return authenticatedApiCall("/dashboard/stats", {
-		method: "GET",
-	  });
+		return authenticatedApiCall("/dashboard/stats", {
+			method: "GET",
+		});
 	},
-  };
+};
+
+export const profileApi = {
+	updateCompanyProfile: async (
+		data: Partial<CompanyProfile>
+	): Promise<ApiResponse> => {
+		return authenticatedApiCall("/profile/company", {
+			method: "PUT",
+			body: JSON.stringify(data),
+		});
+	},
+
+	uploadLogo: async (file: File): Promise<ApiResponse> => {
+		const formData = new FormData();
+		formData.append("logo", file);
+
+		return authenticatedApiCall("/upload/logo", {
+			method: "POST",
+			body: formData,
+		});
+	},
+};

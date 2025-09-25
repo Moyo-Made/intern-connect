@@ -37,6 +37,7 @@ export interface CompanyProfile {
 }
 
 export interface AuthUser {
+	logoUrl: CompanyProfile;
 	user: User;
 	profile: StudentProfile | CompanyProfile;
 }

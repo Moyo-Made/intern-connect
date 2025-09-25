@@ -4,11 +4,28 @@ import { Building2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Input } from "./ui/input";
 import { CompanyProfile } from "@/types/interface";
-import { authApi } from "@/lib/api-client";
+import { authApi, profileApi } from "@/lib/api-client";
 import { Textarea } from "./ui/textarea";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import { useState, useEffect } from "react";
+import toast from "react-hot-toast";
+
+interface FormData {
+	companyName: string;
+	website: string;
+	description: string;
+}
 
 const ProfileTab = () => {
+	const [logoFile, setLogoFile] = useState<File | null>(null);
+	const [logoPreview, setLogoPreview] = useState<string | null>(null);
+	const [formData, setFormData] = useState<FormData>({
+		companyName: "",
+		website: "",
+		description: "",
+	});
+	const queryClient = useQueryClient();
+
 	const {
 		data: userData,
 		isLoading,
@@ -19,6 +36,79 @@ const ProfileTab = () => {
 		select: (response) => (response.success ? response.data : null),
 		staleTime: 10 * 60 * 1000, // 10 minutes
 	});
+
+	// Update form data when userData loads
+	useEffect(() => {
+		if (userData?.user.userType === "COMPANY") {
+			const profile = userData.profile as CompanyProfile;
+			setFormData({
+				companyName: profile.companyName || "",
+				website: profile.website || "",
+				description: profile.description || "",
+			});
+		}
+	}, [userData]);
+
+	const updateProfileMutation = useMutation({
+		mutationFn: profileApi.updateCompanyProfile,
+		onSuccess: () => {
+			queryClient.invalidateQueries({
+				queryKey: ["user-profile"],
+			});
+			toast.success("Profile updated successfully!");
+		},
+		onError: (error) => {
+			toast.error("Failed to update profile. Please try again.");
+		},
+	});
+
+	const uploadLogoMutation = useMutation({
+		mutationFn: profileApi.uploadLogo,
+		onError: (error) => {
+			toast.error("Failed to upload logo. Please try again.");
+		},
+	});
+
+	const handleInputChange = (field: keyof FormData, value: string) => {
+		setFormData((prev) => ({
+			...prev,
+			[field]: value,
+		}));
+	};
+
+	const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			setLogoFile(file);
+			const previewUrl = URL.createObjectURL(file);
+			setLogoPreview(previewUrl);
+		}
+	};
+
+	const handleSave = async () => {
+		try {
+			let logoUrl = (userData?.profile as CompanyProfile)?.logoUrl;
+
+			// Upload logo first if there's a new file
+			if (logoFile) {
+				const uploadResult = await uploadLogoMutation.mutateAsync(logoFile);
+				logoUrl = uploadResult.data.logoUrl;
+			}
+
+			await updateProfileMutation.mutateAsync({
+				companyName: formData.companyName,
+				website: formData.website,
+				description: formData.description,
+				logoUrl,
+			});
+
+			// Clear logo preview after successful save
+			setLogoFile(null);
+			setLogoPreview(null);
+		} catch (error) {
+			// Error handling is done in mutation onError callbacks
+		}
+	};
 
 	if (isLoading) {
 		return (
@@ -54,10 +144,9 @@ const ProfileTab = () => {
 							</label>
 							<Input
 								type="text"
-								defaultValue={
-									userData?.user.userType === "COMPANY"
-										? (userData.profile as CompanyProfile).companyName
-										: ""
+								value={formData.companyName}
+								onChange={(e) =>
+									handleInputChange("companyName", e.target.value)
 								}
 							/>
 						</div>
@@ -65,7 +154,12 @@ const ProfileTab = () => {
 							<label className="block text-sm font-medium text-gray-700 mb-1">
 								Email
 							</label>
-							<Input type="email" defaultValue={userData?.user?.email || ""} />
+							<Input
+								type="email"
+								value={userData?.user?.email || ""}
+								disabled
+								className="bg-gray-50"
+							/>
 						</div>
 
 						<div>
@@ -74,11 +168,8 @@ const ProfileTab = () => {
 							</label>
 							<Input
 								type="url"
-								defaultValue={
-									userData?.user.userType === "COMPANY"
-										? (userData.profile as CompanyProfile).website || ""
-										: ""
-								}
+								value={formData.website}
+								onChange={(e) => handleInputChange("website", e.target.value)}
 							/>
 						</div>
 						<div>
@@ -87,10 +178,9 @@ const ProfileTab = () => {
 							</label>
 							<Textarea
 								rows={4}
-								defaultValue={
-									userData?.user.userType === "COMPANY"
-										? (userData.profile as CompanyProfile).description || ""
-										: ""
+								value={formData.description}
+								onChange={(e) =>
+									handleInputChange("description", e.target.value)
 								}
 							/>
 						</div>
@@ -102,9 +192,32 @@ const ProfileTab = () => {
 						Company Logo
 					</h3>
 					<div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
-						<Building2 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
-						<p className="text-sm text-gray-600 mb-2">Upload company logo</p>
-						<Button variant="outline" size="sm">
+						{logoPreview || (userData?.profile as CompanyProfile)?.logoUrl ? (
+							<img
+								src={
+									logoPreview || (userData?.profile as CompanyProfile)?.logoUrl
+								}
+								alt="Company logo"
+								className="mx-auto h-24 w-24 object-contain mb-4"
+							/>
+						) : (
+							<Building2 className="mx-auto h-12 w-12 text-gray-400 mb-4" />
+						)}
+						<p className="text-sm text-gray-600 mb-2">
+							{logoFile ? logoFile.name : "Upload company logo"}
+						</p>
+						<input
+							type="file"
+							accept="image/*"
+							onChange={handleFileChange}
+							className="hidden"
+							id="logo-upload"
+						/>
+						<Button
+							variant="outline"
+							size="sm"
+							onClick={() => document.getElementById("logo-upload")?.click()}
+						>
 							Choose File
 						</Button>
 					</div>
@@ -112,7 +225,16 @@ const ProfileTab = () => {
 			</div>
 
 			<div className="mt-6 flex justify-end">
-				<Button>Save Changes</Button>
+				<Button
+					onClick={handleSave}
+					disabled={
+						updateProfileMutation.isPending || uploadLogoMutation.isPending
+					}
+				>
+					{updateProfileMutation.isPending || uploadLogoMutation.isPending
+						? "Saving..."
+						: "Save Changes"}
+				</Button>
 			</div>
 		</div>
 	);

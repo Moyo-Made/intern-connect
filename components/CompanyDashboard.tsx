@@ -21,6 +21,7 @@ import OverviewTab from "./OverviewTab";
 import InternshipsTab from "./InternshipsTab";
 import ApplicationsTab from "./ApplicationsTab";
 import ProfileTab from "./ProfileTab";
+import Image from "next/image";
 
 const CompanyDashboard = () => {
 	const [activeTab, setActiveTab] = useState("overview");
@@ -115,12 +116,22 @@ const CompanyDashboard = () => {
 							</span>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center p-0 hover:bg-blue-600"
-									>
-										<Building2 className="w-4 h-4 text-white" />
-									</Button>
+									{(user?.profile as CompanyProfile)?.logoUrl ? (
+										<Image
+											src={(user?.profile as CompanyProfile).logoUrl || ""}
+											alt="Company logo"
+											className="w-8 h-8 rounded-full object-cover"
+											width={32}
+											height={32}
+										/>
+									) : (
+										<Button
+											variant="ghost"
+											className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center p-0 hover:bg-blue-600"
+										>
+											<Building2 className="w-4 h-4 text-white" />
+										</Button>
+									)}
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-56">
 									<DropdownMenuLabel>
