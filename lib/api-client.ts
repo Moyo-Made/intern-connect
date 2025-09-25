@@ -211,3 +211,11 @@ export const applicationsApi = {
 		});
 	},
 };
+
+export const dashboardApi = {
+	getStats: async (): Promise<ApiResponse> => {
+	  return authenticatedApiCall("/dashboard/stats", {
+		method: "GET",
+	  });
+	},
+  };

@@ -1,4 +1,3 @@
-
 import {
 	getApplicationStatusColor,
 	getApplicationStatusIcon,
@@ -7,9 +6,26 @@ import { Building2, CheckCircle, Clock, Users } from "lucide-react";
 import React from "react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
-import { applications } from "@/data/data";
+import { useQuery } from "@tanstack/react-query";
+import { dashboardApi, applicationsApi } from "@/lib/api-client";
 
 const OverviewTab = () => {
+	// Stats data
+	const { data: statsData, isLoading: statsLoading } = useQuery({
+		queryKey: ["dashboard-stats"],
+		queryFn: dashboardApi.getStats,
+		staleTime: 2 * 60 * 1000, // 2 minutes
+	});
+
+	// Recent applications data
+	const { data: applicationsData, isLoading: applicationsLoading } = useQuery({
+		queryKey: ["company-applications"],
+		queryFn: () => applicationsApi.getCompanyApplications({ limit: 5 }),
+		staleTime: 2 * 60 * 1000,
+	});
+
+	const stats = statsData?.data || {};
+	const recentApplications = applicationsData?.data?.applications || [];
 	return (
 		<div>
 			<div className="mb-8">
@@ -32,7 +48,9 @@ const OverviewTab = () => {
 							<p className="text-sm font-medium text-gray-600">
 								Active Internships
 							</p>
-							<p className="text-2xl font-bold text-gray-900">2</p>
+							<p className="text-2xl font-bold text-gray-900">
+								{statsLoading ? "..." : stats.activeInternships || 0}
+							</p>
 						</div>
 					</div>
 				</div>
@@ -45,7 +63,10 @@ const OverviewTab = () => {
 							<p className="text-sm font-medium text-gray-600">
 								Total Applications
 							</p>
-							<p className="text-2xl font-bold text-gray-900">73</p>
+							<p className="text-2xl font-bold text-gray-900">
+
+							{statsLoading ? "..." : stats.totalApplications || 0}
+							</p>
 						</div>
 					</div>
 				</div>
@@ -58,7 +79,9 @@ const OverviewTab = () => {
 							<p className="text-sm font-medium text-gray-600">
 								Pending Reviews
 							</p>
-							<p className="text-2xl font-bold text-gray-900">12</p>
+							<p className="text-2xl font-bold text-gray-900">
+								{statsLoading ? "..." : stats.pendingReviews || 0}
+							</p>
 						</div>
 					</div>
 				</div>
@@ -69,7 +92,9 @@ const OverviewTab = () => {
 						</div>
 						<div className="ml-4">
 							<p className="text-sm font-medium text-gray-600">Hired</p>
-							<p className="text-2xl font-bold text-gray-900">8</p>
+							<p className="text-2xl font-bold text-gray-900">
+								{statsLoading ? "..." : stats.hired || 0}
+							</p>
 						</div>
 					</div>
 				</div>
@@ -104,39 +129,60 @@ const OverviewTab = () => {
 							</tr>
 						</thead>
 						<tbody className="bg-white divide-y divide-gray-200">
-							{applications.slice(0, 5).map((app) => (
-								<tr key={app.id} className="hover:bg-gray-50">
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="text-sm font-medium text-gray-900">
-											{app.studentName}
-										</div>
-										<div className="text-sm text-gray-500">{app.email}</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="text-sm text-gray-900">
-											{app.internshipTitle}
-										</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-										{app.appliedDate}
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap">
-										<div className="flex items-center">
-											{getApplicationStatusIcon(app.status)}
-											<Badge
-												className={`ml-2 ${getApplicationStatusColor(app.status)}`}
-											>
-												{app.status.toUpperCase()}
-											</Badge>
-										</div>
-									</td>
-									<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-										<Button variant="ghost" size="sm" className="cursor-pointer">
-											View
-										</Button>
+							{applicationsLoading ? (
+								<tr>
+									<td colSpan={5} className="px-6 py-4 text-center">
+										Loading recent applications...
 									</td>
 								</tr>
-							))}
+							) : recentApplications.length === 0 ? (
+								<tr>
+									<td
+										colSpan={5}
+										className="px-6 py-4 text-center text-gray-500"
+									>
+										No recent applications
+									</td>
+								</tr>
+							) : (
+								recentApplications.map((app: any) => (
+									<tr key={app.id} className="hover:bg-gray-50">
+										<td className="px-6 py-4 whitespace-nowrap">
+											<div className="text-sm font-medium text-gray-900">
+												{app.studentName}
+											</div>
+											<div className="text-sm text-gray-500">{app.email}</div>
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap">
+											<div className="text-sm text-gray-900">
+												{app.internshipTitle}
+											</div>
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+											{new Date(app.appliedAt).toLocaleDateString()}
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap">
+											<div className="flex items-center">
+												{getApplicationStatusIcon(app.status)}
+												<Badge
+													className={`ml-2 ${getApplicationStatusColor(app.status)}`}
+												>
+													{app.status.toUpperCase()}
+												</Badge>
+											</div>
+										</td>
+										<td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
+											<Button
+												variant="ghost"
+												size="sm"
+												className="cursor-pointer"
+											>
+												View
+											</Button>
+										</td>
+									</tr>
+								))
+							)}
 						</tbody>
 					</table>
 				</div>
