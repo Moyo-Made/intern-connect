@@ -13,6 +13,9 @@ const StudentProfileTab = () => {
 	const [profilePreview, setProfilePreview] = useState<string | null>(null);
 	const [skills, setSkills] = useState<string[]>([]);
 	const [newSkill, setNewSkill] = useState("");
+	const [resumeFile, setResumeFile] = useState<File | null>(null);
+	const [resumePreview, setResumePreview] = useState<string | null>(null);
+	const [isSaving, setIsSaving] = useState(false);
 	const [formData, setFormData] = useState({
 		firstName: "",
 		lastName: "",
@@ -48,7 +51,7 @@ const StudentProfileTab = () => {
 				phone: profile.phone || "",
 				university: profile.university || "",
 				major: profile.major || "",
-				graduationYear: profile.graduationYear?.toString() || "", 
+				graduationYear: profile.graduationYear?.toString() || "",
 				bio: profile.bio || "",
 				portfolioUrl: profile.portfolioUrl || "",
 				linkedinUrl: profile.linkedinUrl || "",
@@ -72,6 +75,22 @@ const StudentProfileTab = () => {
 			queryClient.invalidateQueries({ queryKey: ["user-profile"] });
 		},
 	});
+
+	const uploadResumeMutation = useMutation({
+		mutationFn: (file: File) => profileApi.uploadImage(file, "student-resume"),
+		onSuccess: () => {
+			queryClient.invalidateQueries({ queryKey: ["user-profile"] });
+			toast.success("Resume uploaded successfully!");
+		},
+	});
+
+	const handleResumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+		const file = e.target.files?.[0];
+		if (file) {
+			setResumeFile(file);
+			setResumePreview(file.name);
+		}
+	};
 
 	const handleProfilePictureChange = (
 		e: React.ChangeEvent<HTMLInputElement>
@@ -117,6 +136,7 @@ const StudentProfileTab = () => {
 
 		let profilePictureUrl = (userData?.profile as StudentProfile)
 			?.profilePictureUrl;
+		let resumeUrl = (userData?.profile as StudentProfile)?.resumeUrl;
 
 		if (profilePicture) {
 			const uploadResult =
@@ -125,10 +145,18 @@ const StudentProfileTab = () => {
 			profilePictureUrl = uploadResult.data.profilePictureUrl;
 		}
 
+		if (resumeFile) {
+			const uploadResult = await uploadResumeMutation.mutateAsync(resumeFile);
+			resumeUrl = uploadResult.data.resumeUrl;
+		}
+
+		setIsSaving(true);
+
 		const dataToSend = {
 			...formData,
-			graduationYear: parseInt(formData.graduationYear), 
+			graduationYear: parseInt(formData.graduationYear),
 			profilePictureUrl,
+			resumeUrl,
 		};
 
 		// Save profile and skills
@@ -136,6 +164,8 @@ const StudentProfileTab = () => {
 			updateProfileMutation.mutateAsync(dataToSend),
 			profileApi.updateStudentSkills(skills),
 		]);
+
+		setIsSaving(false);
 	};
 
 	if (isLoading) {
@@ -430,13 +460,27 @@ const StudentProfileTab = () => {
 						<div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center">
 							<FileText className="mx-auto h-12 w-12 text-gray-400 mb-4" />
 							<p className="text-sm text-gray-600 mb-2">
-								{userData?.user.userType === "STUDENT"
-									? (userData.profile as StudentProfile).resumeUrl
-										? "Resume uploaded"
-										: "No resume uploaded"
-									: "No resume uploaded"}
+								{resumePreview
+									? `Selected: ${resumePreview}`
+									: userData?.user.userType === "STUDENT"
+										? (userData.profile as StudentProfile).resumeUrl
+											? "Resume uploaded"
+											: "No resume uploaded"
+										: "No resume uploaded"}
 							</p>
-							<button className="text-blue-600 hover:text-blue-700 text-sm font-medium">
+							<input
+								type="file"
+								accept=".pdf,.doc,.docx"
+								onChange={handleResumeChange}
+								className="hidden"
+								id="resume-upload"
+							/>
+							<button
+								onClick={() =>
+									document.getElementById("resume-upload")?.click()
+								}
+								className="text-blue-600 hover:text-blue-700 text-sm font-medium"
+							>
 								Update Resume
 							</button>
 						</div>
@@ -447,9 +491,10 @@ const StudentProfileTab = () => {
 			<div className="mt-6 flex justify-end">
 				<button
 					onClick={handleSave}
-					className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-md font-medium transition-colors"
+					disabled={isSaving}
+					className="bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white px-6 py-2 rounded-md font-medium transition-colors"
 				>
-					Save Changes
+					{isSaving ? "Saving..." : "Save Changes"}
 				</button>
 			</div>
 		</div>

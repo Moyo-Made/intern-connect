@@ -20,6 +20,7 @@ export async function PUT(request: NextRequest) {
       linkedinUrl,
       githubUrl,
       profilePictureUrl,
+      resumeUrl
     } = requestData;
 
     const updatedProfile = await prisma.studentProfile.update({
@@ -35,7 +36,8 @@ export async function PUT(request: NextRequest) {
         portfolioUrl,
         linkedinUrl,
         githubUrl,
-        profilePictureUrl, // This should have the URL
+        profilePictureUrl, 
+        resumeUrl
       },
     });
 

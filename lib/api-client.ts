@@ -233,7 +233,7 @@ export const profileApi = {
 
 	uploadImage: async (
 		file: File,
-		type: "company-logo" | "student-avatar" = "company-logo"
+		type: "company-logo" | "student-avatar" | "student-resume" = "company-logo"
 	): Promise<ApiResponse> => {
 		const formData = new FormData();
 		formData.append("logo", file);

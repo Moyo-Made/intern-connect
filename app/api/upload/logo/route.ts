@@ -23,6 +23,11 @@ export async function POST(request: NextRequest) {
 							{ quality: "auto", fetch_format: "auto" },
 						],
 					};
+				case "student-resume":
+					return {
+						folder: "student-resumes",
+						transformation: [{ quality: "auto", fetch_format: "auto" }],
+					};
 				case "company-logo":
 				default:
 					return {
@@ -56,7 +61,9 @@ export async function POST(request: NextRequest) {
 		const responseData =
 			uploadType === "student-avatar"
 				? { profilePictureUrl: uploadResult.secure_url }
-				: { logoUrl: uploadResult.secure_url };
+				: uploadType === "student-resume"
+					? { resumeUrl: uploadResult.secure_url }
+					: { logoUrl: uploadResult.secure_url };
 
 		return Response.json({
 			success: true,
