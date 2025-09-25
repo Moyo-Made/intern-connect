@@ -109,6 +109,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					payload: {
 						user: result.data.user,
 						profile: result.data.profile,
+						logoUrl: result.data.logoUrl
 					},
 				});
 			} else {
@@ -145,6 +146,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					payload: {
 						user: response.data.user,
 						profile: response.data.profile,
+						logoUrl: response.data.logoUrl
 					},
 				});
 
@@ -185,6 +187,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 					payload: {
 						user: response.data.user,
 						profile: response.data.profile,
+						logoUrl: response.data.logoUrl
 					},
 				});
 
