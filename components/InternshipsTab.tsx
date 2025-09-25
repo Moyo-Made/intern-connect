@@ -198,7 +198,14 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 											</div>
 											<div className="flex items-center">
 												<Users className="w-4 h-4 mr-1" />
-												<span>{internship.applications} applications</span>
+												<span>
+													<span>
+														{internship.applicationCount ||
+															internship._count?.applications ||
+															0}{" "}
+													</span>{" "}
+													applications
+												</span>
 											</div>
 										</div>
 										<p className="text-gray-700">{internship.description}</p>
@@ -323,7 +330,7 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 										}
 									>
 										<SelectTrigger>
-											<SelectValue placeholder="Select duration"  />
+											<SelectValue placeholder="Select duration" />
 										</SelectTrigger>
 										<SelectContent>
 											<SelectItem value="3-months">3 months</SelectItem>
@@ -426,7 +433,6 @@ const InternshipsTab = ({ onTabChange }: InternshipsTabProps) => {
 										Duration
 									</label>
 									<Select
-									
 										value={formData.duration}
 										onValueChange={(value) =>
 											setFormData((prev) => ({

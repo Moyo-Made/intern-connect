@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
 				requirements: Array.isArray(data.requirements)
 					? data.requirements
 					: data.requirements.split(",").map((r) => r.trim()),
-				
+
 				duration: data.duration,
 				companyId: decoded.userId,
 				isRemote: data.location.toLowerCase().includes("remote"),
@@ -99,7 +99,7 @@ export async function GET(request: NextRequest) {
 		const location = searchParams.get("location");
 		const isRemote = searchParams.get("isRemote");
 		const search = searchParams.get("search");
-		
+
 		const skip = (page - 1) * limit;
 
 		// Build where clause based on filters
@@ -117,25 +117,25 @@ export async function GET(request: NextRequest) {
 		if (isRemote !== null) {
 			where.isRemote = isRemote === "true";
 		}
-		
+
 		if (search) {
 			where.OR = [
-			  {
-				title: {
-				  contains: search,
-				  mode: "insensitive",
+				{
+					title: {
+						contains: search,
+						mode: "insensitive",
+					},
 				},
-			  },
-			  {
-				company: {
-				  companyName: {
-					contains: search,
-					mode: "insensitive",
-				  },
+				{
+					company: {
+						companyName: {
+							contains: search,
+							mode: "insensitive",
+						},
+					},
 				},
-			  },
 			];
-		  }
+		}
 
 		// Get internships with company info
 		const [internships, total] = await Promise.all([
@@ -152,6 +152,11 @@ export async function GET(request: NextRequest) {
 							companyName: true,
 							description: true,
 							location: true,
+						},
+					},
+					_count: {
+						select: {
+							applications: true,
 						},
 					},
 				},
