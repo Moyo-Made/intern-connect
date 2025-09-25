@@ -1,4 +1,4 @@
-import { CompanyProfile } from "@/types/interface";
+import { CompanyProfile, StudentProfile } from "@/types/interface";
 import { RegistrationData, LoginData, InternshipData } from "./validation";
 
 const API_BASE = "/api";
@@ -231,13 +231,33 @@ export const profileApi = {
 		});
 	},
 
-	uploadLogo: async (file: File): Promise<ApiResponse> => {
+	uploadImage: async (
+		file: File,
+		type: "company-logo" | "student-avatar" = "company-logo"
+	): Promise<ApiResponse> => {
 		const formData = new FormData();
 		formData.append("logo", file);
+		formData.append("type", type);
 
 		return authenticatedApiCall("/upload/logo", {
 			method: "POST",
 			body: formData,
+		});
+	},
+
+	updateStudentProfile: async (
+		data: Partial<StudentProfile>
+	): Promise<ApiResponse> => {
+		return authenticatedApiCall("/profile/student", {
+			method: "PUT",
+			body: JSON.stringify(data),
+		});
+	},
+
+	updateStudentSkills: async (skills: string[]): Promise<ApiResponse> => {
+		return authenticatedApiCall("/profile/student/skills", {
+			method: "PUT",
+			body: JSON.stringify({ skills }),
 		});
 	},
 };

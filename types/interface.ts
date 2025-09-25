@@ -9,6 +9,7 @@ export interface User {
 }
 
 export interface StudentProfile {
+	userSkills: never[];
 	id: string;
 	firstName: string;
 	lastName: string;
@@ -22,6 +23,7 @@ export interface StudentProfile {
 	linkedinUrl?: string;
 	githubUrl?: string;
 	skills: string[]
+	profilePictureUrl?: string;
 }
 
 export interface CompanyProfile {

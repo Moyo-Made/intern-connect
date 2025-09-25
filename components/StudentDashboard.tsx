@@ -18,6 +18,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import StudentProfileTab from "./StudentProfileTab";
 import FindInternship from "./FindInternships";
 import StudentsApplication from "./StudentsApplicationTab";
+import Image from "next/image";
 
 const StudentDashboard = () => {
 	const [activeTab, setActiveTab] = useState("internships");
@@ -38,7 +39,6 @@ const StudentDashboard = () => {
 			router.push("/dashboard/company");
 		}
 	}, [authLoading, isAuthenticated, user, router]);
-
 
 	const handleLogout = () => {
 		logout();
@@ -106,12 +106,25 @@ const StudentDashboard = () => {
 							</span>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
-									<Button
-										variant="ghost"
-										className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center p-0 hover:bg-blue-600"
-									>
-										<User className="w-4 h-4 text-white" />
-									</Button>
+									{(user?.profile as StudentProfile)?.profilePictureUrl ? (
+										<Image
+											src={
+												(user?.profile as StudentProfile).profilePictureUrl ||
+												""
+											}
+											alt="Company logo"
+											className="w-8 h-8 rounded-full object-cover"
+											width={32}
+											height={32}
+										/>
+									) : (
+										<Button
+											variant="ghost"
+											className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center p-0 hover:bg-blue-600"
+										>
+											<User className="w-4 h-4 text-white" />
+										</Button>
+									)}
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end" className="w-56">
 									<DropdownMenuLabel>

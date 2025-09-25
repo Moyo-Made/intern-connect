@@ -57,17 +57,14 @@ const ProfileTab = () => {
 			});
 			toast.success("Profile updated successfully!");
 		},
-		onError: (error) => {
+		onError: () => {
 			toast.error("Failed to update profile. Please try again.");
 		},
 	});
-
-	const uploadLogoMutation = useMutation({
-		mutationFn: profileApi.uploadLogo,
-		onError: (error) => {
-			toast.error("Failed to upload logo. Please try again.");
-		},
-	});
+	  
+	  const uploadImageMutation = useMutation({
+		mutationFn: (file: File) => profileApi.uploadImage(file, 'student-avatar'),
+	  });
 
 	const handleInputChange = (field: keyof FormData, value: string) => {
 		setFormData((prev) => ({
@@ -91,7 +88,7 @@ const ProfileTab = () => {
 
 			// Upload logo first if there's a new file
 			if (logoFile) {
-				const uploadResult = await uploadLogoMutation.mutateAsync(logoFile);
+				const uploadResult = await uploadImageMutation.mutateAsync(logoFile);
 				logoUrl = uploadResult.data.logoUrl;
 			}
 
@@ -228,10 +225,10 @@ const ProfileTab = () => {
 				<Button
 					onClick={handleSave}
 					disabled={
-						updateProfileMutation.isPending || uploadLogoMutation.isPending
+						updateProfileMutation.isPending || uploadImageMutation.isPending
 					}
 				>
-					{updateProfileMutation.isPending || uploadLogoMutation.isPending
+					{updateProfileMutation.isPending || uploadImageMutation.isPending
 						? "Saving..."
 						: "Save Changes"}
 				</Button>

@@ -67,6 +67,13 @@ export async function GET(request: NextRequest) {
 		if (user.userType === "STUDENT") {
 			profile = await prisma.studentProfile.findUnique({
 				where: { userId: user.id },
+				include: {
+					userSkills: {
+						include: {
+							skill: true,
+						},
+					},
+				},
 			});
 		} else if (user.userType === "COMPANY") {
 			profile = await prisma.companyProfile.findUnique({
