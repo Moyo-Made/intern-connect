@@ -17,6 +17,7 @@ const ApplicationsTab = () => {
 		null
 	);
 	const [isResumeModalOpen, setIsResumeModalOpen] = useState(false);
+	const [pendingAction, setPendingAction] = useState<string | null>(null);
 	const queryClient = useQueryClient();
 
 	const {
@@ -37,8 +38,15 @@ const ApplicationsTab = () => {
 			applicationId: string;
 			status: string;
 		}) => applicationsApi.updateStatus(applicationId, status),
+		onMutate: (variables) => {
+			setPendingAction(variables.status);
+		},
 		onSuccess: () => {
 			queryClient.invalidateQueries({ queryKey: ["company-applications"] });
+			setPendingAction(null);
+		},
+		onError: () => {
+			setPendingAction(null);
 		},
 	});
 
@@ -183,7 +191,7 @@ const ApplicationsTab = () => {
 													}
 													disabled={updateStatusMutation.isPending}
 												>
-													{updateStatusMutation.isPending
+													{pendingAction === "ACCEPTED"
 														? "Accepting..."
 														: "Accept"}
 												</Button>
@@ -199,7 +207,7 @@ const ApplicationsTab = () => {
 													}
 													disabled={updateStatusMutation.isPending}
 												>
-													{updateStatusMutation.isPending
+													{pendingAction === "REJECTED"
 														? "Rejecting..."
 														: "Reject"}
 												</Button>

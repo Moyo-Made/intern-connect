@@ -125,19 +125,6 @@ const FindInternship = () => {
 							</SelectContent>
 						</Select>
 					</div>
-					<div className="w-48">
-						<Select value={companyFilter} onValueChange={setCompanyFilter}>
-							<SelectTrigger>
-								<SelectValue placeholder="All Companies" />
-							</SelectTrigger>
-							<SelectContent>
-								<SelectItem value="all">All Companies</SelectItem>
-								<SelectItem value="techcorp">TechCorp</SelectItem>
-								<SelectItem value="dataflow">DataFlow Inc</SelectItem>
-								<SelectItem value="brandmax">BrandMax</SelectItem>
-							</SelectContent>
-						</Select>
-					</div>
 				</div>
 			</div>
 
