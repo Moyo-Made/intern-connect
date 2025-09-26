@@ -2,12 +2,12 @@ import {
 	Search,
 	Users,
 	Target,
-	MessageSquare,
 	BookOpen,
 	Briefcase,
 	Clock,
 	Award,
 	TrendingUp,
+	BarChart3,
 } from "lucide-react";
 
 const Features = () => {
@@ -31,14 +31,13 @@ const Features = () => {
 			stats: "500+ active recruiters",
 		},
 		{
-			icon: MessageSquare,
-			title: "Real-Time Chat",
-			description:
-				"No more waiting weeks for email replies. Chat directly with companies and get answers in minutes, not months.",
-			bgColor: "bg-orange-50",
-			iconBg: "bg-orange-500",
-			stats: "< 2hr avg response",
-		},
+			icon: BarChart3,
+			title: "Application Analytics",
+			description: "Track your application performance like a data scientist. See what's working, what's not, and optimize your job hunt.",
+			bgColor: "bg-purple-50",
+			iconBg: "bg-purple-500",
+			stats: "3x higher success rate",
+		  }
 	];
 
 	const additionalFeatures = [
@@ -192,7 +191,7 @@ const Features = () => {
 							"Finally, a platform that doesn't make me want to throw my laptop"
 						</h3>
 						<p className="text-blue-100 text-lg mb-6">
-							- Sarah Chen, Stanford CS '24, now at Google
+							- Moyo Made, LASU CS '24, now at Google
 						</p>
 						<div className="grid grid-cols-3 gap-8 text-center">
 							<div>

@@ -164,10 +164,9 @@ const HeroSection = ({
 									Trusted by students from:
 								</div>
 								<div className="flex gap-6 text-sm text-slate-400">
-									<span>Stanford</span>
-									<span>MIT</span>
-									<span>UC Berkeley</span>
-									<span>Carnegie Mellon</span>
+									<span>Lagos State University</span>
+									<span>University of Ibadan</span>
+									<span>University of Lagos</span>
 									<span>200+ Universities</span>
 								</div>
 							</div>

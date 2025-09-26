@@ -227,23 +227,6 @@ const Contact = () => {
 											</p>
 										</div>
 									</div>
-
-									<div className="flex items-start gap-4 p-4 bg-emerald-50 rounded-xl">
-										<div className="w-10 h-10 bg-emerald-500 rounded-lg flex items-center justify-center flex-shrink-0">
-											<MessageCircle className="w-5 h-5 text-white" />
-										</div>
-										<div>
-											<h4 className="font-semibold text-slate-800">
-												Live Chat
-											</h4>
-											<p className="text-slate-600 text-sm mb-2">
-												Quick questions and immediate help
-											</p>
-											<p className="text-emerald-600 font-medium">
-												Available 9 AM - 6 PM WAT
-											</p>
-										</div>
-									</div>
 								</div>
 							</div>
 
@@ -285,7 +268,7 @@ const Contact = () => {
 									"These guys actually care. Got a response in 20 minutes on a
 									Sunday."
 								</p>
-								<p className="text-blue-200">- Alex, UC Berkeley</p>
+								<p className="text-blue-200">- Ade, UNILAG</p>
 							</div>
 						</div>
 					</div>
